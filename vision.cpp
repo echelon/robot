@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "gui/Trackbar.h"
+
 /** 
  * houghLines
  * Needs an edge-detected image, such as one from Canny, as the

@@ -9,11 +9,14 @@ all: vision
 vision.o: vision.cpp
 	gcc -g -Wall $(INCPATH) $(OPTIONS) -c vision.cpp
 
+gui/Trackbar.o: gui/Trackbar.cpp
+	gcc -g -Wall $(INCPATH) $(OPTIONS) -c gui/Trackbar.cpp
+
 # linking the program.
-vision: vision.o
-	gcc -g vision.o $(LIBPATH) $(OPTIONS) -o vision
+vision: vision.o Trackbar.o
+	gcc -g vision.o Trackbar.o $(LIBPATH) $(OPTIONS) -o vision
 
 # cleaning everything that can be automatically recreated with "make".
 clean:
-	/bin/rm -f vision vision.o a.out
+	/bin/rm -R -f vision *.o *.out
 

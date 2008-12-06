@@ -1,3 +1,6 @@
+
+#include <stdio.h>
+#include <math.h>
 #include <cv.h>
 #include <highgui.h>
 
@@ -8,7 +11,7 @@ class Trackbar
 {
 	public:
 		int value;
-		Trackbar(char windowName, int maxVal, int defVal = 0);
+		Trackbar(char windowName, int maxVal, int defVal);
 };
 
 #endif
