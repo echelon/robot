@@ -5,29 +5,7 @@
 
 #include "gui/Trackbar.hpp"
 #include "transform/hough.hpp"
-
-/**
- * extractChannel
- * Extract a single image channel into another multichannel image.
- */
-IplImage* extractChannel(IplImage* src, int channel)
-{
-	int height     = src->height;
-	int width      = src->width;
-	int step       = src->widthStep/sizeof(uchar);
-	int channels   = src->nChannels;
-	uchar* sdata    = (uchar*)src->imageData;
-
-	IplImage* dst = cvCreateImage(cvGetSize(src), 8, 3);
-	uchar* dstdata    = (uchar*)src->imageData;
-	for (int i = 0; i < height; i++) {
-		for (int j = 0; j < width; j++) {
-			int addr = i*step+j*channels+channel;
-			dstdata[addr] = sdata[addr];
-		}
-	}
-	return dst;
-}
+#include "transform/overlay.hpp"
 
 /**
  * Main 
@@ -71,11 +49,13 @@ int main(int argc, char** argv)
         cvCanny(gray, dst, t1.value, t2.value, 3); // grayscale canny
         //cvCanny(gray, dst, 50, 80, 3); // grayscale canny
 
+		IplImage * overlay = overlayEdges(dst, src);
+
         //cvCvtColor(dst, hough, CV_GRAY2BGR); // gs canny color canny
-		houghLines(dst, src); // bw canny -> color hough
+		houghLines(dst, overlay); // bw canny -> color hough
 
         //cvShowImage("output", src);
-        cvShowImage("output", src);
+        cvShowImage("output", overlay);
 
         if((cvWaitKey(10) & 255) == 27) break;
 
