@@ -1,19 +1,10 @@
+#include "Trackbar.hpp"
 
-#include <stdio.h>
-#include <math.h>
-#include <cv.h>
-#include <highgui.h>
-
-#include "Trackbar.h"
-
-Trackbar::Trackbar(char windowName, int maxVal, int defVal)
+/**
+ * Trackbar constructor.
+ */
+Trackbar::Trackbar(const char* windowName, const char* trackName, int maxVal, int defVal)
 {
 	this->value = defVal;
-
-	static int n = 0;
-	n++;
-
-	cvCreateTrackbar((const char*)n, (const char*)windowName, &this->value, maxVal, NULL);
-
-
+	cvCreateTrackbar(trackName, windowName, &this->value, maxVal, NULL);
 }

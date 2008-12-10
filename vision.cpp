@@ -3,29 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "gui/Trackbar.h"
-
-/** 
- * houghLines
- * Needs an edge-detected image, such as one from Canny, as the
- * source image. 
- */
-void houghLines(IplImage* src, IplImage* dst)
-{
-		// Copy image to a destination image
-		//IplImage* dst = cvCreateImage(cvGetSize(src), 8, 3);
-        //cvCvtColor(src, dst, CV_GRAY2BGR);
-
-        CvMemStorage* storage = cvCreateMemStorage(0);
-        CvSeq* lines = 0;
-
-        lines = cvHoughLines2(src, storage, CV_HOUGH_PROBABILISTIC, 
-					1, CV_PI/180, 50, 50, 10);
-        for(int i = 0; i < lines->total; i++) {
-            CvPoint* line = (CvPoint*)cvGetSeqElem(lines,i);
-            cvLine(dst, line[0], line[1], CV_RGB(255,0,0), 3, 8);
-        }
-}
+#include "gui/Trackbar.hpp"
+#include "transform/hough.hpp"
 
 /**
  * extractChannel
@@ -70,13 +49,8 @@ int main(int argc, char** argv)
 	IplImage* hough = 0;
 
     cvNamedWindow("output", 1);
-
-	int thresh1 = 50;
-	int thresh2 = 80;
-
-	cvCreateTrackbar("thresh1", "output", &thresh1, 100, NULL);
-	cvCreateTrackbar("thresh2", "output", &thresh2, 200, NULL);
-
+	Trackbar t1 = Trackbar("output", "thresh1", 100, 50);
+	Trackbar t2 = Trackbar("output", "thresh2", 200, 80);
 
 	while(1)
     {
@@ -94,17 +68,14 @@ int main(int argc, char** argv)
 
 		cvCvtColor(src, gray, CV_BGR2GRAY); // grayscale original
 
-
-		int thresh1 = cvGetTrackbarPos("thresh1", "output");
-		int thresh2 = cvGetTrackbarPos("thresh2", "output");
-        cvCanny(gray, dst, thresh1, thresh2, 3); // grayscale canny
+        cvCanny(gray, dst, t1.value, t2.value, 3); // grayscale canny
         //cvCanny(gray, dst, 50, 80, 3); // grayscale canny
 
         //cvCvtColor(dst, hough, CV_GRAY2BGR); // gs canny color canny
-		houghLines(dst, dst); // bw canny -> color hough
+		houghLines(dst, src); // bw canny -> color hough
 
         //cvShowImage("output", src);
-        cvShowImage("output", dst);
+        cvShowImage("output", src);
 
         if((cvWaitKey(10) & 255) == 27) break;
 
