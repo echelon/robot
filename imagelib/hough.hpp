@@ -1,5 +1,5 @@
-#ifndef __defined_transform_hough_hpp
-#define __defined_transform_hough_hpp
+#ifndef __defined_imagelib_hough_hpp
+#define __defined_imagelib_hough_hpp
 
 #include <cv.h>
 #include <highgui.h>

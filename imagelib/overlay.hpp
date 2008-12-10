@@ -3,7 +3,7 @@
 
 #include <cv.h>
 #include <highgui.h>
-#include "../libs/canvas.hpp"
+#include "canvas.hpp"
 
 /** 
  * overlayEdges

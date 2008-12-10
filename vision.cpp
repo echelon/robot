@@ -4,8 +4,10 @@
 #include <math.h>
 
 #include "gui/Trackbar.hpp"
-#include "transform/hough.hpp"
-#include "transform/overlay.hpp"
+#include "imagelib/dim.hpp"
+#include "imagelib/hough.hpp"
+#include "imagelib/overlay.hpp"
+#include "imagelib/sepchannel.hpp"
 
 /**
  * Main 
@@ -27,8 +29,8 @@ int main(int argc, char** argv)
 	IplImage* hough = 0;
 
     cvNamedWindow("output", 1);
-	Trackbar t1 = Trackbar("output", "thresh1", 100, 50);
-	Trackbar t2 = Trackbar("output", "thresh2", 200, 80);
+	Trackbar t1 = Trackbar("output", "v1", 255, 100);
+	Trackbar t2 = Trackbar("output", "v2", 255, 150);
 
 	while(1)
     {
@@ -44,18 +46,29 @@ int main(int argc, char** argv)
 			hough = cvCreateImage(cvGetSize(src), 8, 3);
 		}
 
-		cvCvtColor(src, gray, CV_BGR2GRAY); // grayscale original
+		//cvCvtColor(src, gray, CV_BGR2GRAY);
+        //cvCanny(gray, dst, t1.value, t2.value, 3);
+		//IplImage * overlay = overlayEdges(dst, src);
+		//houghLines(dst, overlay); 
 
-        cvCanny(gray, dst, t1.value, t2.value, 3); // grayscale canny
-        //cvCanny(gray, dst, 50, 80, 3); // grayscale canny
 
-		IplImage * overlay = overlayEdges(dst, src);
+		int color[3] = {95, 202, 65};
 
-        //cvCvtColor(dst, hough, CV_GRAY2BGR); // gs canny color canny
-		houghLines(dst, overlay); // bw canny -> color hough
+		IplImage* wh = dimOtherColors(src, color, t1.value, (t2.value*0.01f));
 
-        //cvShowImage("output", src);
-        cvShowImage("output", overlay);
+		float percents[3] = {0.37254902f, 0.792156863f, 0.254901961f};
+		//float percents[3] = {1.0f, 1.0f, 1.0f};
+		//float percents[3] = {0.1f, 0.3f, 0.1f};
+		IplImage* out = sepChannel(wh, percents);
+
+
+
+
+		//cvCvtColor(out, gray, CV_BGR2GRAY);
+		//cvThreshold(gray, dst, t1.value, t2.value, CV_THRESH_BINARY);
+
+
+        cvShowImage("output", wh);
 
         if((cvWaitKey(10) & 255) == 27) break;
 

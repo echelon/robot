@@ -1,5 +1,5 @@
-#ifndef __defined_libs_canvas_hpp
-#define __defined_libs_canvas_hpp
+#ifndef __defined_imagelib_canvas_hpp
+#define __defined_imagelib_canvas_hpp
 
 #include <cv.h>
 #include <highgui.h>
@@ -9,7 +9,7 @@
 
 /**
  * Image
- * Simple access to Images.
+ * Simple access to image pixels/channels.
  */
 template<class T> class Image
 {
