@@ -1,5 +1,5 @@
-#ifndef __defined_imagelib_dim_hpp
-#define __defined_imagelib_dim_hpp
+#ifndef __defined_imagelib_colordim_hpp
+#define __defined_imagelib_colordim_hpp
 
 #include <cv.h>
 #include <highgui.h>

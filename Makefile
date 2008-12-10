@@ -11,17 +11,20 @@ clean:
 	cd ./imagelib && $(RM) -f *.o *.out
 
 ### LINK ##########
-vision: vision.o imagelib/dim.o imagelib/hough.o imagelib/overlay.o \
-		imagelib/sepchannel.o gui/Trackbar.o
-	g++ -g vision.o imagelib/dim.o imagelib/hough.o imagelib/overlay.o \
-		imagelib/sepchannel.o gui/Trackbar.o $(LIBPATH) $(OPTIONS) -o vision
+vision: vision.o imagelib/colordim.o imagelib/colorreplace.o imagelib/hough.o \
+		imagelib/overlay.o imagelib/sepchannel.o gui/Trackbar.o
+	g++ -g vision.o imagelib/colordim.o imagelib/colorreplace.o imagelib/hough.o \
+		imagelib/overlay.o imagelib/sepchannel.o gui/Trackbar.o $(LIBPATH) $(OPTIONS) -o vision
 
 ### COMPILE #######
 vision.o: vision.cpp
 	g++ -g -Wall $(INCPATH) $(OPTIONS) -c vision.cpp
 
-imagelib/dim.o: imagelib/dim.cpp imagelib/dim.hpp
-	cd ./imagelib && g++ -g -Wall $(INCPATH) $(OPTIONS) -c dim.cpp
+imagelib/colordim.o: imagelib/colordim.cpp imagelib/colordim.hpp
+	cd ./imagelib && g++ -g -Wall $(INCPATH) $(OPTIONS) -c colordim.cpp
+
+imagelib/colorreplace.o: imagelib/colorreplace.cpp imagelib/colorreplace.hpp
+	cd ./imagelib && g++ -g -Wall $(INCPATH) $(OPTIONS) -c colorreplace.cpp
 
 imagelib/hough.o: imagelib/hough.cpp imagelib/hough.hpp
 	cd ./imagelib && g++ -g -Wall $(INCPATH) $(OPTIONS) -c hough.cpp

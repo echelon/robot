@@ -1,5 +1,5 @@
 #include <math.h>
-#include "dim.hpp"
+#include "colordim.hpp"
 
 IplImage* dimColor(IplImage* src, int rgb[3], int threshold, float percent)
 {
