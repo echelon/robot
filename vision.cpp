@@ -9,6 +9,8 @@
 #include "imagelib/hough.hpp"
 #include "imagelib/overlay.hpp"
 #include "imagelib/sepchannel.hpp"
+#include "serial/serializer.hpp"
+#include "tts/Festival.hpp"
 
 /**
  * Main 
@@ -20,6 +22,27 @@ int main(int argc, char** argv)
         fprintf(stderr,"Could not initialize capturing. Exiting...\n");
         return -1;
 	}
+
+	//Serializer a = Serializer();
+	//a.mogo(50, 50);
+
+	// *** BEGIN TTS ****
+    /*FILE *iopipe;
+
+    if( (iopipe = popen( "festival --pipe", "w" )) == NULL )
+        exit( 1 );
+
+
+	fputs("(SayText \"Testing 1 2 3\")", iopipe);
+	fflush(iopipe);*/
+
+	Festival f = Festival();
+	
+	f.say("test");
+	//f.say("Testing text to speech, 1 2 3");
+
+    //printf( "\nProcess returned %d\n", pclose( iopipe ) );
+	// *** END TTS ****
 
 	//cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 320);
 	//cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, 240); 
@@ -75,6 +98,10 @@ int main(int argc, char** argv)
 		int others[3] = {0, 0, 0};
 
 		IplImage* wh = replaceColors(src, colors, others);
+
+		if(t1.value == 0) {
+			f.say("Threshold at 0");
+		}
 
 		//float percents[3] = {0.37254902f, 0.792156863f, 0.254901961f};
 		//float percents[3] = {1.0f, 1.0f, 1.0f};
