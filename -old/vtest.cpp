@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "ai/Map.hpp"
 #include "gui/Trackbar.hpp"
 #include "imagelib/colordim.hpp"
 #include "imagelib/colorreplace.hpp"
 #include "imagelib/hough.hpp"
 #include "imagelib/overlay.hpp"
 #include "imagelib/sepchannel.hpp"
-#include "serial/serializer.hpp"
+#include "serial/Serializer.hpp"
 #include "tts/Festival.hpp"
 
 /**
@@ -37,9 +38,17 @@ int main(int argc, char** argv)
 	fflush(iopipe);*/
 
 	Festival f = Festival();
+
+	Map map = Map(100, 100);
 	
-	f.say("test");
+	//f.say("test");
 	//f.say("Testing text to speech, 1 2 3");
+
+	char buff1[200];
+	sprintf(buff1, "Current position is at %i/%i, facing up, with a velocity of 50.", map.getCurrentPos().x, map.getCurrentPos().y);
+	f.say(buff1);
+
+	//printf(buff1);
 
     //printf( "\nProcess returned %d\n", pclose( iopipe ) );
 	// *** END TTS ****
@@ -63,6 +72,10 @@ int main(int argc, char** argv)
 			break;
 		}
 		
+		char buff[200];
+		sprintf(buff, "Current position is at %i-%i, facing up, with a velocity of 50.", map.getCurrentPos().x, map.getCurrentPos().y);
+		f.say(buff);
+
 		if (!dst) {
 			printf("Creating images...\n");
 			dst = cvCreateImage(cvGetSize(src), 8, 1);

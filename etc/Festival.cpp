@@ -6,7 +6,7 @@ Festival::Festival()
 		printf("Failure to launch festival.");
 	}
 
-	//this->timeCalled = time(NULL) - 50;
+	this->timeCalled = 0;
 }
 
 Festival::~Festival()
@@ -22,11 +22,30 @@ void Festival::say(const char* text)
 	int lasttime = (int)this->timeCalled;
 	int diff = curtime - lasttime;
 
-	if(diff < 2) {
+	// Make sure we had enough time to say what we last did
+	/*int pauseTime = int(ceil(sizeof(this->lastSaid)*0.5)) + 2;
+
+	printf("Time: %i", int(ceil(sizeof(this->lastSaid)*0.9)));
+
+	int pauseTime = 2;
+	if(this->lastSaid) {
+		//printf("Last said true");
+		pauseTime = 2;
+		int oPauseTime = int(sizeof(this->lastSaid)*0.1);
+
+		if(oPauseTime > pauseTime) {
+			pauseTime = oPauseTime;
+		}
+
+	}*/
+
+	int pauseTime = 6;
+	if(diff < pauseTime) {
 		return;
 	}
 
 	this->timeCalled = curtime;
+	this->lastSaid = *text;
 
 	char buff[500];
 

@@ -21,6 +21,10 @@ void dimColor(IplImage* src, IplImage* dst, int rgb[3], int threshold = 20, floa
 IplImage* dimOtherColors(IplImage* src, int rgb[3], int threshold = 20, float percent = 0.5f);
 void dimOtherColors(IplImage* src, IplImage* dst, int rgb[3], int threshold = 20, float percent = 0.5f);
 
+// Multiple preservation
+IplImage* dimOtherColors(IplImage* src, int rgb[][3], int threshold = 20, float percent = 0.5f);
+void dimOtherColors(IplImage* src, IplImage* dst, int rgb[][3], int threshold = 20, float percent = 0.5f);
+
 /** 
  * dimGrays
  * Dim out the homogeneous gray values (R=G=B) that occur in the image

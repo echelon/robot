@@ -1,0 +1,18 @@
+
+[Anjuta]
+Fullscreen=1
+Geometry=1024x600+0+0
+
+[File Loader]
+Files=file:///home/brandon/Devel/robot/Makefile#30%%%file:///home/brandon/Devel/robot/device/Keyboard.cpp#1%%%file:///home/brandon/Devel/robot/device/Serializer.hpp#1%%%file:///home/brandon/Devel/robot/device/Serializer.cpp#1%%%file:///home/brandon/Devel/robot/Projects/motor/main.cpp#9%%%file:///home/brandon/Devel/robot/internals/Thread.cpp#10%%%file:///home/brandon/Devel/robot/internals/Thread.hpp#1
+
+[Execution]
+Program arguments=
+Program uri=file:///home/brandon/Devel/robot/motor
+Run in terminal=2
+Working directories=file:///home/brandon/Devel/robot
+Environment variables=
+
+[Build]
+Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
+Selected Configuration=Default
