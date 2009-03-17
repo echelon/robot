@@ -3,19 +3,35 @@
 
 #include <termios.h>
 
-/**
- * ADAPTED FROM http://linux-sxs.org/programming/kbhit.html
- */
-
 namespace Device {
+
+/**
+ * Query the Keyboard
+ * Adapted from: http://linux-sxs.org/programming/kbhit.html
+ */
 
 class Keyboard
 {
 	public:
+		/**
+		 * Set up terminal options.
+		 */
+		Keyboard();
 
-		 Keyboard();
+		/**
+		 * Restore original terminal options.
+		 */
 		~Keyboard();
+
+		/**
+		 * See if there is a waiting character on the buffer (a keypress event)
+		 * TODO: Bool method?
+		 */
 		int kbhit();
+
+		/**
+		 * Get the available keyboard character.
+		 */
 		int getch();
 
 	private:

@@ -10,6 +10,7 @@ pthread_mutex_t Serial::lineMutex = PTHREAD_MUTEX_INITIALIZER;
 
 Serial::Serial()
 {
+	fd = 0;
 }
 
 Serial::~Serial()
@@ -20,10 +21,18 @@ Serial::~Serial()
 void Serial::Open() // named to avoid clashes
 {
 	if(isOpen()) {
+		printf("Serial is already open\n");
 		return;
 	}
 
 	fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK); 
+
+	if (fd == -1) {
+		printf("Unable to open /dev/ttyUSB0\n");
+		return;
+	}
+
+	printf("/dev/ttyUSB open on %d\n", fd);
 
     tcgetattr(fd, &options); // alter current options
 
@@ -54,17 +63,9 @@ void Serial::Open() // named to avoid clashes
 	options.c_oflag &= ~(OPOST);
 	options.c_lflag &= ~(ICANON|ECHO|ECHOE|ECHOK|ECHONL|ISIG|IEXTEN);
 
-
 	// flush I/O & set options
 	tcflush(fd, TCIOFLUSH);
     tcsetattr(fd, TCSANOW, &options);
-
-	if (fd == -1) {
-		printf("Unable to open /dev/ttyUSB0\n");
-	}
-	else {
-		printf("/dev/ttyUSB open on %d\n", fd);
-	}
 }
 
 bool Serial::isOpen() 
@@ -100,7 +101,9 @@ int Serial::Select(int nanoseconds, int seconds)
 	tv.tv_sec = seconds;
 	tv.tv_usec = nanoseconds;
 
-	return select(fd+1, &rfds, 0, 0, &tv);
+	int r = select(fd+1, &rfds, 0, 0, &tv);
+
+	return 1; // TODO: Recent error with select. WTF is going on?
 }
 
 
@@ -110,6 +113,7 @@ void Serial::Write(const char* data)
 {
 	if(!isOpen()) {
 		// TODO: throw exception
+		printf("Writing to a non-open file.\n");
 		return;
 	}
 
@@ -120,7 +124,8 @@ void Serial::Write(const char* data)
 
 	while(len > 0) { // TODO: Wrap entire contents of while loop with try block
 
-		int r = Select();
+		//int r = Select();
+		int r = 1; // TODO: Huge problem with select. It used to work...
 		if(r < 0) {
 			printf("Error with select()\n");
 			return; // TODO: exception

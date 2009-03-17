@@ -6,6 +6,7 @@ namespace Device {
 
 RCSerializer::RCSerializer()
 {
+	fd = 0;
 }
 
 RCSerializer::~RCSerializer()
@@ -17,6 +18,17 @@ char* RCSerializer::fw()
 {
 	flush();
 	Write("fw\r");
+
+	char* ret = Read();
+
+	flush();
+	return ret;
+}
+
+char* RCSerializer::battery()
+{
+	flush();
+	Write("sensor 5\r");
 
 	char* ret = Read();
 

@@ -35,11 +35,6 @@ class Serial
 		 */
 		~Serial();
 
-//=================== CONNECTION ===================//
-// The read, write, and readWrite methods all have
-// static mutex locks on them to keep the line safe.
-//==================================================//
-
 		/**
 		 * Open connection - set up baud rates, parity, etc.
 		 * TODO: Do not fix to /dev/ttyUSB0
@@ -85,7 +80,7 @@ class Serial
 
 		char* test(const char* input);
 
-	private:
+	protected:
 		/**
 		 * File descriptor of an open connection.
 		 */
