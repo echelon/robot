@@ -1,0 +1,7 @@
+1 -
+SIFT Library not linking properly. What's wrong?
+Do we need to do something to the object table?
+
+2 -
+Once enough vision libs are here, create an external
+library for them distinct from this project.

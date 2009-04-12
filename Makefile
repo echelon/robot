@@ -2,11 +2,12 @@
 COMPILE = g++ -g -Wall
 LINK = g++ -g
 RM = /bin/rm
-INCPATH = -I/usr/local/include/opencv
-LIBS = -L/usr/local/bin -lhighgui -lstdc++ -lpthread
+INCPATH = -I/usr/local/include/opencv -I/usr/local/include/libfeat
+LIBS = -L/usr/local/bin -lhighgui -lstdc++ -lpthread -lfeat
 
-all: laser motor
+all: laser motor sift
 
+.PHONY: clean
 clean:
 	$(RM) -f *.o *.out laser motor test test.o
 	cd ./ai && $(RM) -f *.o *.out
@@ -17,11 +18,23 @@ clean:
 	cd ./vision && $(RM) -f *.o *.out
 	cd ./Projects && $(RM) -f */*.o */*.out
 
+
 ### TEST ###########################
 test: test.cpp
 	$(COMPILE) $(INCPATH) -c test.cpp
 	$(LINK) test.o $(LIBS) -o test
 
+
+### SIFT TEST ######################
+sift: Projects/sift/main.o internals/Registry.o vision/Camera.o vision/Window.o
+	@echo "== Linking Laser =="
+	$(LINK) Projects/sift/main.o internals/Registry.o vision/Camera.o \
+	vision/Window.o $(LIBS) -o sift
+	@echo "========== Laser compile SUCCESS! =========="
+	
+Projects/sift/main.o: Projects/sift/main.cpp
+	@echo "== Compiling Laser =="
+	cd ./Projects/sift && $(COMPILE) $(INCPATH) -c main.cpp
 
 ### LASER TEST #####################
 laser: Projects/laser/main.o internals/Registry.o vision/Camera.o vision/Window.o
