@@ -1,0 +1,9 @@
+# Generated files
+*.[oa]
+*~
+*.bak
+
+# Binary names - prone to change
+vision
+motor
+laser
