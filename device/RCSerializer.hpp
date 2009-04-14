@@ -51,6 +51,12 @@ class RCSerializer: public Serial
 		void mogo(int m1, int m2);
 
 		/**
+		 * Blink the two LEDs
+		 * Set only the LED that is meant to be turned on. 
+		 */
+		void blink(int r1 = -1, int r2 = -1);
+
+		/**
 		 * Stop the motor.
 		 */
 		void stop();

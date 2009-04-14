@@ -17,13 +17,19 @@ class Thread
 {
 	public:
 		/**
-		 * Thread default constructor does nothing.
+		 * Thread default constructor initializes flags. Do not forget to call
+		 * this from the initialization list of the constructors of any 
+		 * subclasses.
 		 */
 		Thread();
 
 		/**
+		 * Destructor - needs to be virtual.
+		 */
+		virtual ~Thread();
+
+		/**
 		 * Start the thread.
-		 * TODO: Optionally supply an argument.
 		 */
 		void start();
 
@@ -35,28 +41,53 @@ class Thread
 
    protected:
 		/**
+		 * Calls setup() and sets flag.
+		 */
+		void doSetup();
+
+		/**
+		 * Calls destroy() and sets flag.
+		 * Useful to call in subclassed destructors to ensure unfinished threads
+		 * that are being culled the from outside are fully destroyed.
+		 */
+		void doDestroy();
+
+		/**
 		 * Any setup (constructor-like) for the subclassed thread
 		 * that needs to occur.
 		 */
 		virtual void setup();
 
 		/**
+		 * Any destruction (destructor-like) for the subclassed thread
+		 * that needs to occur.
+		 */
+		virtual void destroy();
+
+		/**
 		 * Execution code for the subclassed thread.
-		 * TODO: Was void execute(void*)
 		 */
 		virtual void execute(void*);
 
 		/**
 		 * Thread execution.
-		 * TODO: was int run(void* arg)
 		 */
 		void run();
 
 		/**
 		 * Thread entry code.
-		 * TODO: was void* entryPoint(void*)
 		 */
 		static void* entryPoint(void*);
+
+		/**
+		 * Whether setup() has been run.
+		 */
+		bool wasSetup;
+
+		/**
+		 * Whether destroy() has been run.
+		 */
+		bool wasDestroyed;
 
    private:
 		/**

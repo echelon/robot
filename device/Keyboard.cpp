@@ -1,5 +1,6 @@
 #include "Keyboard.hpp"
-#include <unistd.h> // read()
+#include <unistd.h>
+#include <stdio.h>
 
 namespace Device {
 
@@ -14,11 +15,14 @@ Keyboard::Keyboard()
     new_settings.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_settings);
     peek_character=-1;
+
+	printf("Grabbing keyboard.\n");
 }
 
 Keyboard::~Keyboard()
 {
     tcsetattr(0, TCSANOW, &initial_settings);
+	printf("Keyboard returned.\n");
 }
 
 int Keyboard::kbhit()

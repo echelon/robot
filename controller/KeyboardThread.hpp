@@ -18,10 +18,14 @@ class KeyboardThread: public Internals::Thread
 		KeyboardThread(Device::RCSerializer* ser);
 		~KeyboardThread();
 
+	protected:
+		void setup();
+		void destroy();
 		void execute(void*);
 
 	private:
 		Device::RCSerializer* serial;
+		Device::Keyboard* keyboard;
 
 };
 }

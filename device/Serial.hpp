@@ -3,10 +3,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h>		// File control
 #include <errno.h>
 #include <termios.h>	// POSIX terminal control
-#include <unistd.h>		// UNIX standard functions
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <pthread.h> // for mutex locks, eg as in fw()
@@ -39,7 +37,7 @@ class Serial
 		 * Open connection - set up baud rates, parity, etc.
 		 * TODO: Do not fix to /dev/ttyUSB0
 		 */
-		void Open();
+		void open();
 
 		/**
 		 * Is the connection handler open?
@@ -49,7 +47,7 @@ class Serial
 		/**
 		 * Close the connection.
 		 */
-		void Close();
+		void close();
 
 		/**
 		 * Flush a queue with tcflush. Provide the queue to be flushed,
@@ -58,20 +56,15 @@ class Serial
 		void flush(int queue = TCIOFLUSH);
 
 		/**
-		 * Wait for the line to open.
-		 */
-		int Select(int nanoseconds = 50500, int seconds = 0);
-
-		/**
 		 * Read a specified number of bytes from the line.
 		 */
-		char* Read(int bytes = 1000); // TODO: Test if this name conflicts
+		char* read(int bytes = 1000); // TODO: Test if this name conflicts
 
 		/**
 		 * Write a specified number of bytes of a character buffer 
 		 * to the line.
 		 */
-		void Write(const char* data); // TODO: Test if this name conflicts
+		void write(const char* data); // TODO: Test if this name conflicts
 
 		/**
 		 * Write to the line, then read the response.
@@ -95,6 +88,12 @@ class Serial
 		 * Mutex for writing/reading the line
 		 */
 		static pthread_mutex_t lineMutex;
+
+		/**
+		 * Wait for the line to open.
+		 */
+		int select(int nanoseconds = 50500, int seconds = 0);
+
 };
 }
 #endif

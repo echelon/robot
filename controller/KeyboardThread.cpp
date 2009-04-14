@@ -1,57 +1,90 @@
 #include "KeyboardThread.hpp"
+#include "../internals/MainThreadControl.hpp"
 
 namespace Controller {
 
-KeyboardThread::KeyboardThread(Device::RCSerializer* ser)
+KeyboardThread::KeyboardThread(Device::RCSerializer* ser): Thread()
 {
 	serial = ser;
 }
 
 KeyboardThread::~KeyboardThread()
 {
-	// nothing
+	doDestroy();
+}
+
+void KeyboardThread::setup()
+{
+	keyboard = new Device::Keyboard();
+}
+
+void KeyboardThread::destroy()
+{
+	delete keyboard;
+	Internals::MainThreadControl::signal();
 }
 
 void KeyboardThread::execute(void*)
 {
 	if(!serial->isOpen()) {
-		serial->Open();
+		serial->open();
 		if(!serial->isOpen()) {
 			printf("Serial not open... ending keyboard thread\n");
 			return;
 		}
 	}
 
-	Device::Keyboard keyboard;
 	int ch;
 	bool quit = false;
 	char* read;
 
 	while(!quit) {
-		if(keyboard.kbhit()) {
-			ch = keyboard.getch();
+		if(keyboard->kbhit()) {
+			ch = keyboard->getch();
 			
 			switch(ch) {
+				case 49: // 1
+					serial->blink(0,0);
+					printf("Blink 0 0\n");
+					break;
+				case 50: // 2
+					serial->blink(-1,50);
+					printf("Blink 0 50\n");
+					break;
+				case 51: // 3
+					serial->blink(50);
+					printf("Blink 50 0\n");
+					break;
+				case 52: // 4
+					serial->blink(-1,100);
+					printf("Blink 50 50\n");
+					break;
+				case 53: // 5
+					serial->blink(100);
+					printf("Blink 50 50\n");
+					break;
+
+
 				case 119: // w - forward						
-					serial->mogo(10, 10);
+					serial->mogo(100, 100);
 					printf("Forward\n");
 					break;
 
 				case 97: // a - left
 					printf("Left\n");
-					serial->mogo(-10, 10);
+					serial->mogo(-100, 100);
 					break;
 
 				case 100: // d - right
 					//serial->mogo(5,-5);
 					printf("Right\n");
-					serial->mogo(10, -10);
+					serial->mogo(100, -100);
 					break;
 
 				case 115: // s - back
 					//serial->mogo(-5,-5);
 					printf("Back\n");
-					serial->mogo(-10, -10);
+					serial->mogo(-100, -100);
 					break;
 
 				case 120: // x - stop
@@ -73,7 +106,7 @@ void KeyboardThread::execute(void*)
 
 				case 114: // r- read
 					printf("Read\n");
-					read = serial->Read();
+					read = serial->read();
 					printf("Read:%s\n", read);
 					break;
 
@@ -85,14 +118,14 @@ void KeyboardThread::execute(void*)
 
 				case 110: // n
 					printf("Nonsense input command and read\n");
-					serial->Write("asdfjhk\r");
-					read = serial->Read();
+					serial->write("asdfjhk\r");
+					read = serial->read();
 					printf("Read:%s\n", read);
 					break;
 
 				case 109: // m
 					printf("Nonsense input command WITHOUT read\n");
-					serial->Write("asdfjhk\r");
+					serial->write("asdfjhk\r");
 					break;
 
 				case 113: // q

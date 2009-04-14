@@ -1,7 +1,12 @@
+
 #include "Serial.hpp"
+#include <unistd.h>	// UNIX standard functions
+#include <fcntl.h> // file control
 #include <string.h> // using strlen
 #include <errno.h> // errno
 #include <sys/select.h> // select
+#include <stdexcept> 
+
 
 
 namespace Device {
@@ -15,34 +20,33 @@ Serial::Serial()
 
 Serial::~Serial()
 {
-	Close();
+	close();
 }
 
-void Serial::Open() // named to avoid clashes
+void Serial::open() // named to avoid clashes
 {
 	if(isOpen()) {
-		printf("Serial is already open\n");
-		return;
+		throw std::runtime_error("Serial is already open");
 	}
 
-	fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK); 
+	fd = ::open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK); 
 
 	if (fd == -1) {
-		printf("Unable to open /dev/ttyUSB0\n");
-		return;
+		throw std::runtime_error("Unable to open /dev/ttyUSB0");
 	}
 
 	printf("/dev/ttyUSB open on %d\n", fd);
 
-    tcgetattr(fd, &options); // alter current options
+	// alter the current options
+    tcgetattr(fd, &options);
 
 	// 19200 baud
     cfsetispeed(&options, B19200);
     cfsetospeed(&options, B19200);
 
 	// Set serial connection options for Serializer.
-	//   "The SerializerTM ships communicating at 19200 baud, 8 data bits, 1
-	//	  stop bit, No Parity, and no Flow Control."
+	// "The SerializerTM ships communicating at 19200 baud, 8 data bits, 
+	//  1 stop bit, No Parity, and no Flow Control."
 
 	// Control flags
 	options.c_cflag |= CLOCAL;		// Ignore status lines
@@ -73,11 +77,11 @@ bool Serial::isOpen()
 	return (fd > 0); // 0 is stdin
 }
 
-void Serial::Close()
+void Serial::close()
 {
 	if(isOpen()) {
 		printf("Closing connection...\n");
-		close(fd);
+		::close(fd);
 	}
 }
 
@@ -90,7 +94,7 @@ void Serial::flush(int queue)
 }
 
 
-int Serial::Select(int nanoseconds, int seconds)
+int Serial::select(int nanoseconds, int seconds)
 {
 	struct timeval tv;
 	fd_set rfds;
@@ -101,7 +105,7 @@ int Serial::Select(int nanoseconds, int seconds)
 	tv.tv_sec = seconds;
 	tv.tv_usec = nanoseconds;
 
-	int r = select(fd+1, &rfds, 0, 0, &tv);
+	int r = ::select(fd+1, &rfds, 0, 0, &tv);
 
 	return 1; // TODO: Recent error with select. WTF is going on?
 }
@@ -109,7 +113,7 @@ int Serial::Select(int nanoseconds, int seconds)
 
 // TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
 // What about flush, etc?
-void Serial::Write(const char* data)
+void Serial::write(const char* data)
 {
 	if(!isOpen()) {
 		// TODO: throw exception
@@ -135,7 +139,7 @@ void Serial::Write(const char* data)
 			return; // Didn't become available
 		}
 
-		int written = write(fd, buff.c_str(), len);
+		int written = ::write(fd, buff.c_str(), len);
 		buff.erase(0, written);
 		len -= written;
 
@@ -153,7 +157,7 @@ void Serial::Write(const char* data)
 
 // TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
 // What about flush, etc?
-char* Serial::Read(int bytes)
+char* Serial::read(int bytes)
 {
 	if(!isOpen()) {
 		// TODO: throw exception
@@ -170,7 +174,7 @@ char* Serial::Read(int bytes)
 	int failcnt = 0;
 	while(buff.length() < bytes) {
 
-		int r = Select();
+		int r = select();
 		if(r < 0) {
 			printf("Error with select()\n");
 			return 0; // TODO: exception
@@ -181,7 +185,7 @@ char* Serial::Read(int bytes)
 		}
 
 		char rbuf[1000];
-		int re = read(fd, rbuf, bytes-buff.length());
+		int re = ::read(fd, rbuf, bytes-buff.length());
 		if(!re) {
 			if(failcnt >= 5) {
 				break;

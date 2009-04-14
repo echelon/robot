@@ -9,7 +9,7 @@ all: laser motor sift
 
 .PHONY: clean
 clean:
-	$(RM) -f *.o *.out laser motor test test.o
+	$(RM) -f *.o *.a *.out laser motor test
 	cd ./ai && $(RM) -f *.o *.out
 	cd ./controller && $(RM) -f *.o *.out
 	cd ./device && $(RM) -f *.o *.out
@@ -48,12 +48,14 @@ Projects/laser/main.o: Projects/laser/main.cpp
 	cd ./Projects/laser && $(COMPILE) $(INCPATH) -c main.cpp
 
 ### MOTOR TEST #####################
-motor: Projects/motor/main.o device/RCSerializer.o device/Serial.o \
-	device/Joystick.o device/Keyboard.o internals/Thread.o \
+motor: Projects/motor/main.o \
+	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
+	internals/Thread.o internals/MainThreadControl.o \
 	controller/KeyboardThread.o controller/XboxThread.o
 	@echo "== Linking Motor =="
-	$(LINK) Projects/motor/main.o device/RCSerializer.o device/Serial.o \
-	device/Joystick.o device/Keyboard.o internals/Thread.o \
+	$(LINK) Projects/motor/main.o \
+	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
+	internals/Thread.o internals/MainThreadControl.o \
 	controller/KeyboardThread.o controller/XboxThread.o $(LIBS) -o motor
 	@echo "========== Motor compile SUCCESS! =========="
 	
@@ -82,6 +84,8 @@ internals/Registry.o: internals/Registry.cpp internals/Registry.hpp
 	cd ./internals && $(COMPILE) $(INCPATH) -c Registry.cpp
 internals/Thread.o: internals/Thread.cpp internals/Thread.hpp
 	cd ./internals && $(COMPILE) $(INCPATH) -c Thread.cpp
+internals/MainThreadControl.o: internals/MainThreadControl.cpp internals/MainThreadControl.hpp
+	cd ./internals && $(COMPILE) $(INCPATH) -c MainThreadControl.cpp
 	
 ### VISION LIBS ####################
 vision/Camera.o: vision/Camera.cpp vision/Camera.hpp

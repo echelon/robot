@@ -1,16 +1,23 @@
 #include "Thread.hpp"
+#include <stdio.h>
 
 namespace Internals {
 
-Thread::Thread() {}
+Thread::Thread(): 
+	wasSetup(false), 
+	wasDestroyed(false) 
+{
+	// nothing
+}
+
+Thread::~Thread() 
+{
+	// nothing
+}
 
 void Thread::start()
 {
-	/*Arg(arg); // store user data
-	int code = thread_create(Thread::EntryPoint, this, & ThreadId_);
-	return code;*/
-
-	pthread_create(&thread, NULL, &Thread::entryPoint, this); // TODO: Does this work?
+	pthread_create(&thread, NULL, &Thread::entryPoint, this);
 }
 
 void Thread::join()
@@ -18,29 +25,48 @@ void Thread::join()
 	pthread_join(thread, NULL); 
 }
 
-void Thread::run()
-{
-	setup();
-	execute(0);
-}
-
-/*static */
-void* Thread::entryPoint(void* self) // TODO: was void* Thread::entryPoint(void * pthis)
+void* Thread::entryPoint(void* self)
 {
 	Thread* tp = (Thread*)self;
 	tp->run();
 
-	return 0; // TODO: Temp
+	return 0;
+}
+
+void Thread::run()
+{
+	doSetup();
+	execute(0);
+	doDestroy();
+}
+
+void Thread::doSetup()
+{
+	wasSetup = true;
+	setup();
+}
+
+void Thread::doDestroy()
+{
+	if(wasSetup && !wasDestroyed) {
+		wasDestroyed = true;
+		destroy();
+	}
 }
 
 void Thread::setup()
 {
-	// Do any thread setup here
+	// Override - thread setup here
+}
+
+void Thread::destroy()
+{
+	// Override - thread destruction here
 }
 
 void Thread::execute(void*)
 {
-	// Thread execution code here
+	// Override - thread execution code here
 }
 
 } // end namespace
