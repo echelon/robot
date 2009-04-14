@@ -59,13 +59,13 @@ class Serial
 		/**
 		 * Read a specified number of bytes from the line.
 		 */
-		char* read(int bytes = 1000); // TODO: Test if this name conflicts
+		char* read(int bytes = 1000);
 
 		/**
 		 * Write a specified number of bytes of a character buffer 
 		 * to the line.
 		 */
-		void write(const char* data); // TODO: Test if this name conflicts
+		void write(const char* data, bool priority = false); 
 
 		/**
 		 * Write to the line, then read the response.

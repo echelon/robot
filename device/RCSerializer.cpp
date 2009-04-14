@@ -38,21 +38,32 @@ char* RCSerializer::battery()
 
 void RCSerializer::mogo(int m1, int m2)
 {
+	if(m1 == 0 && m2 == 0) {
+		stop(); // send prioritized stop message instead
+		return;
+	}
+
 	char buff[50];
 
-	printf("mogo(%d, %d)\n", m1, m2);
-
-	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2); // TODO was "mogo 1:1%d 2:1%d\r" Why??
+	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
 	write((const char*)buff);
-	//writeRead(buff, 1000);
 }
 
+/*void RCSerializer::mogoPercent(double m1, double m2)
+{
+	char buff[50];
+
+	int fullSpeed = 500;
+	int lspeed = (int)(lyp*fullSpeed);
+	int rspeed = (int)(ryp*fullSpeed);
+
+	sprintf(buff, "mogo 1:%d 2:%d\r", rspeed, lspeed);
+	write((const char*)buff);
+}*/
 
 void RCSerializer::blink(int r1, int r2)
 {
 	char buff[50];
-
-	printf("blink(%d, %d)\n", r1, r2);
 
 	if(r1 < 0 && r2 < 0) {
 		printf("Blink rates need to be set\n");
@@ -80,7 +91,7 @@ void RCSerializer::blink(int r1, int r2)
 
 void RCSerializer::stop()
 {
-	write("stop\r");
+	write("stop\r", true);
 }
 
 } // end namespace

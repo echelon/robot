@@ -113,19 +113,33 @@ int Serial::select(int nanoseconds, int seconds)
 
 // TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
 // What about flush, etc?
-void Serial::write(const char* data)
+void Serial::write(const char* data, bool priority)
 {
-	printf("In write()!\n");
 	if(!isOpen()) {
 		// TODO: throw exception
 		printf("Writing to a non-open file.\n");
 		return;
 	}
 
-	// TODO TODO TODO TODO - add priority!
-	// See if we're flooding the line
-	timespec curTime;
-	clock_gettime(CLOCK_REALTIME, &curTime);
+	if(!priority) {
+		timespec curTime;
+		clock_gettime(CLOCK_REALTIME, &curTime);
+
+		long secDif = curTime.tv_sec - lastWrite.tv_sec;
+		if(secDif < 1) {
+			printf("Sec difference < 2. Ignoring.\n");
+			return;
+		}
+	}
+	printf("commit message\n");
+
+	/*long last = ((lastWrite.tv_sec%10) * 10000) + (int)(lastWrite.tv_nsec/chopDigits);
+	long cur = ((curTime.tv_sec%10) * 10000) + (int)(curTime.tv_nsec/chopDigits);
+
+	printf("Last: %d . %d\n", lastWrite.tv_sec, lastWrite.tv_nsec);
+	printf("Last: %d\n", last);
+	printf("Cur: %d . %d\n", curTime.tv_sec, curTime.tv_nsec);
+	printf("Cur: %d\n", cur);
 
 	if(lastWrite.tv_sec == curTime.tv_sec) {
 		long dif = curTime.tv_nsec - lastWrite.tv_nsec;
@@ -138,13 +152,11 @@ void Serial::write(const char* data)
 		long dif = lastWrite.tv_nsec - curTime.tv_nsec;
 		if(dif < 1000) {
 			printf("Line busy. Write blocked. (2)\n");
-			printf("Last: %d . %d\n", lastWrite.tv_sec, lastWrite.tv_nsec);
-			printf("Cur: %d . %d\n", curTime.tv_sec, curTime.tv_nsec);
 			return;
 		}
 
 	}
-	printf("GOING AHEAD WITH WRITE...\n");
+	printf("GOING AHEAD WITH WRITE...\n");*/
 
 
 	flush(); // TODO (Not working): First motor command on program run fails.

@@ -42,7 +42,7 @@ void XboxThread::execute(void*)
 		return;
 	}
 
-	while(1) {
+	while(!stopFlag) {
 
 		joystick->updateStatus();
 
@@ -70,26 +70,26 @@ void XboxThread::execute(void*)
 		double ryp = -1* ((double)ry/MAX_AXIS);
 
 		
-		int fullSpeed = 127; // TODO - blinking lights
+		int fullSpeed = 300; // TODO - blinking lights
 
 		// TODO: TEMP - ABSOLUTE VALUE FUNCTION. 
 		// Testing with lights instead of motor. (LED uses positive vals only)
-		if(ly > 0) {
+		/*if(ly > 0) {
 			lyp *= -1;
 		}
 		if(ry > 0) {
 			ryp *= -1;
-		}
+		}*/
 
-		int lblink = (int)(lyp*fullSpeed);
-		int rblink = (int)(ryp*fullSpeed);
+		int lspeed = (int)(lyp*fullSpeed);
+		int rspeed = (int)(ryp*fullSpeed);
 
-		printf("BL: %d BR: %d\n", lblink, rblink);
+		printf("LS: %d RS: %d\n", lspeed, rspeed);
 
 		//joystick->printStatus();
 
-		//serial->mogo(speedR, speedL);
-		serial->blink(lblink, rblink);
+		serial->mogo(rspeed, lspeed);
+		//serial->blink(lblink, rblink);
 	}
 }
 

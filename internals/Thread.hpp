@@ -34,6 +34,11 @@ class Thread
 		void start();
 
 		/**
+		 * Stop the thread.
+		 */
+		void stop();
+
+		/**
 		 * Wait for the thread to finish.
 		 * WARNING: Do not call from the thread itself!
 		 */
@@ -88,6 +93,11 @@ class Thread
 		 * Whether destroy() has been run.
 		 */
 		bool wasDestroyed;
+
+		/**
+		 * Called by stop() to hault the main loop.
+		 */
+		bool stopFlag;
 
    private:
 		/**

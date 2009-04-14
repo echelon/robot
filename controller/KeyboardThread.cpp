@@ -35,10 +35,9 @@ void KeyboardThread::execute(void*)
 	}
 
 	int ch;
-	bool quit = false;
 	char* read;
 
-	while(!quit) {
+	while(!stopFlag) {
 		if(keyboard->kbhit()) {
 			ch = keyboard->getch();
 			
@@ -134,7 +133,7 @@ void KeyboardThread::execute(void*)
 					printf("Quit\n");
 					serial->mogo(0, 0);
 					serial->stop();
-					quit = true;
+					stop();
 					break;
 
 				default:

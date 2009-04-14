@@ -3,9 +3,10 @@
 
 namespace Internals {
 
-Thread::Thread(): 
+Thread::Thread():
 	wasSetup(false), 
-	wasDestroyed(false) 
+	wasDestroyed(false),
+	stopFlag(false)
 {
 	// nothing
 }
@@ -18,6 +19,11 @@ Thread::~Thread()
 void Thread::start()
 {
 	pthread_create(&thread, NULL, &Thread::entryPoint, this);
+}
+
+void Thread::stop()
+{
+	stopFlag = true;
 }
 
 void Thread::join()
@@ -48,6 +54,8 @@ void Thread::doSetup()
 
 void Thread::doDestroy()
 {
+	stop();
+
 	if(wasSetup && !wasDestroyed) {
 		wasDestroyed = true;
 		destroy();
