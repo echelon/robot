@@ -13,6 +13,7 @@
 #include <fstream>
 
 #include <stropts.h> // ioctl
+#include <time.h>
 
 namespace Device {
 /**
@@ -83,6 +84,11 @@ class Serial
 		 * Termios options for the connection.
 		 */	
     	struct termios options;
+
+		/**
+		 * Time of last write().
+		 */
+		timespec lastWrite;
 
 		/**
 		 * Mutex for writing/reading the line

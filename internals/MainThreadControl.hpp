@@ -34,7 +34,6 @@ class MainThreadControl
 		MainThreadControl(const MainThreadControl&);
 		MainThreadControl& operator= (const MainThreadControl&);
 
-
 		/**
 		 * Condition.
 		 */

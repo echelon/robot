@@ -4,9 +4,9 @@
 
 namespace Device {
 
-RCSerializer::RCSerializer()
+RCSerializer::RCSerializer() : Serial()
 {
-	fd = 0;
+	// nothing
 }
 
 RCSerializer::~RCSerializer()

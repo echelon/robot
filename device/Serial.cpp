@@ -5,8 +5,8 @@
 #include <string.h> // using strlen
 #include <errno.h> // errno
 #include <sys/select.h> // select
-#include <stdexcept> 
-
+#include <stdexcept>
+#include <math.h> // abs
 
 
 namespace Device {
@@ -115,11 +115,37 @@ int Serial::select(int nanoseconds, int seconds)
 // What about flush, etc?
 void Serial::write(const char* data)
 {
+	printf("In write()!\n");
 	if(!isOpen()) {
 		// TODO: throw exception
 		printf("Writing to a non-open file.\n");
 		return;
 	}
+
+	// TODO TODO TODO TODO - add priority!
+	// See if we're flooding the line
+	timespec curTime;
+	clock_gettime(CLOCK_REALTIME, &curTime);
+
+	if(lastWrite.tv_sec == curTime.tv_sec) {
+		long dif = curTime.tv_nsec - lastWrite.tv_nsec;
+		if(dif < 1000) {
+			printf("Line busy. Write blocked.\n");
+			return;
+		}
+	}
+	else if(lastWrite.tv_sec == curTime.tv_sec-1) {
+		long dif = lastWrite.tv_nsec - curTime.tv_nsec;
+		if(dif < 1000) {
+			printf("Line busy. Write blocked. (2)\n");
+			printf("Last: %d . %d\n", lastWrite.tv_sec, lastWrite.tv_nsec);
+			printf("Cur: %d . %d\n", curTime.tv_sec, curTime.tv_nsec);
+			return;
+		}
+
+	}
+	printf("GOING AHEAD WITH WRITE...\n");
+
 
 	flush(); // TODO (Not working): First motor command on program run fails.
 
@@ -152,6 +178,7 @@ void Serial::write(const char* data)
 			}
 		}*/
 	}
+	clock_gettime(CLOCK_REALTIME, &lastWrite);
 }
 
 
