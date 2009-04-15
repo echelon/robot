@@ -21,7 +21,7 @@ Serial::Serial(bool useThread):
 	if(useThread) {
 		printf("Creating SerialThead instance.\n");
 		isUsingThread = true;
-		serialThread = new Controller::SerialThread((Device::Serial*)this);
+		serialThread = new Controller::SerialThread(this);
 	}
 }
 
@@ -37,7 +37,9 @@ Serial::~Serial()
 void Serial::open() // named to avoid clashes
 {
 	if(isOpen()) {
-		throw std::runtime_error("Serial is already open");
+		//throw std::runtime_error("Serial is already open");
+		printf("Serial is already open\n");
+		return;
 	}
 
 	fd = ::open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK); 

@@ -6,6 +6,8 @@ namespace Controller {
 
 SerialThread::SerialThread(Device::Serial* ser): Thread()
 {
+	serial = ser;
+
 	messages = std::queue<SerialMessage>();
 	messageMutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 }
@@ -27,25 +29,18 @@ void SerialThread::destroy()
 
 void SerialThread::execute(void*)
 {
-	printf("Now in execute()\n");
 	if(!serial->isOpen()) {
-		printf("Serial line is not open!!!!!!!!!!!!!\n");
 		serial->open();
-		printf("Now it's open\n");
 		if(!serial->isOpen()) {
 			printf("Serial not open... ending serial thread\n");
 			return;
 		}
 	}
 
-	printf("Execution loop start...\n");
-
 	// Main loop of thread sends queued messages
 	while(!stopFlag) {
 		// TODO: Do I need to lock while checking size?
-		printf("Before mutex acq...\n");
 		pthread_mutex_lock(&messageMutex); 
-		printf("After mutex acq...\n");
 		if(messages.size() < 1) {
 			pthread_mutex_unlock(&messageMutex);
 			continue;
