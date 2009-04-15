@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv)
 {
-	Device::RCSerializer* serial = new Device::RCSerializer();
+	Device::RCSerializer* serial = new Device::RCSerializer(true);
 	serial->open();
 
 	Controller::KeyboardThread keyboardThread(serial);
@@ -20,6 +20,12 @@ int main(int argc, char** argv)
 	xboxThread.start();
 
 	Internals::MainThreadControl::wait();
+
+	keyboardThread.stop();
+	keyboardThread.join();
+
+	xboxThread.stop();
+	xboxThread.join();
 
 	return 0;
 }

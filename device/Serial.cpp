@@ -1,5 +1,6 @@
 
 #include "Serial.hpp"
+#include "../controller/SerialThread.hpp"
 #include <unistd.h>	// UNIX standard functions
 #include <fcntl.h> // file control
 #include <string.h> // using strlen
@@ -13,14 +14,24 @@ namespace Device {
 
 pthread_mutex_t Serial::lineMutex = PTHREAD_MUTEX_INITIALIZER;
 
-Serial::Serial()
+Serial::Serial(bool useThread):
+	fd(0),
+	isUsingThread(false)
 {
-	fd = 0;
+	if(useThread) {
+		printf("Creating SerialThead instance.\n");
+		isUsingThread = true;
+		serialThread = new Controller::SerialThread((Device::Serial*)this);
+	}
 }
 
 Serial::~Serial()
 {
 	close();
+
+	if(isUsingThread) {
+		delete serialThread;
+	}
 }
 
 void Serial::open() // named to avoid clashes
@@ -113,11 +124,18 @@ int Serial::select(int nanoseconds, int seconds)
 
 // TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
 // What about flush, etc?
-void Serial::write(const char* data, bool priority)
+void Serial::write(const char* data, bool priority, bool bypassQueue)
 {
 	if(!isOpen()) {
 		// TODO: throw exception
 		printf("Writing to a non-open file.\n");
+		return;
+	}
+
+	// Queue messages
+	if(isUsingThread && !bypassQueue) {
+		serialThread->enqueue((char*)data, priority);
+		serialThread->start();
 		return;
 	}
 

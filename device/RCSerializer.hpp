@@ -28,7 +28,7 @@ class RCSerializer: public Serial
 		/**
 		 * Default constructor
 		 */
-		RCSerializer();
+		RCSerializer(bool useThread = false);
 
 		/**
 		 * Destructor - calls close

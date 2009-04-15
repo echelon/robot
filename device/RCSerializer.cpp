@@ -4,7 +4,7 @@
 
 namespace Device {
 
-RCSerializer::RCSerializer() : Serial()
+RCSerializer::RCSerializer(bool useThread) : Serial(useThread)
 {
 	// nothing
 }
@@ -12,6 +12,10 @@ RCSerializer::RCSerializer() : Serial()
 RCSerializer::~RCSerializer()
 {
 	close();
+
+	if(isUsingThread) {
+		delete serialThread;
+	}
 }
 
 char* RCSerializer::fw()
@@ -38,6 +42,9 @@ char* RCSerializer::battery()
 
 void RCSerializer::mogo(int m1, int m2)
 {
+	printf("mogo disabled\n");
+	return;
+
 	if(m1 == 0 && m2 == 0) {
 		stop(); // send prioritized stop message instead
 		return;
