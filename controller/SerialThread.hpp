@@ -27,7 +27,7 @@ class SerialThread: public Internals::Thread
 	public:
 		/**
 		 * Constructor
-		 */static pthread_mutex_t lineMutex;
+		 */
 		SerialThread(Device::Serial* ser);
 
 		/**

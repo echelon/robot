@@ -50,12 +50,12 @@ Projects/laser/main.o: Projects/laser/main.cpp
 ### MOTOR TEST #####################
 motor: Projects/motor/main.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
-	internals/Thread.o internals/MainThreadControl.o \
+	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/SerialThread.o
 	@echo "== Linking Motor =="
 	$(LINK) Projects/motor/main.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
-	internals/Thread.o internals/MainThreadControl.o \
+	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/SerialThread.o \
 	$(LIBS) -o motor
 	@echo "========== Motor compile SUCCESS! =========="
@@ -89,6 +89,8 @@ internals/Thread.o: internals/Thread.cpp internals/Thread.hpp
 	cd ./internals && $(COMPILE) $(INCPATH) -c Thread.cpp
 internals/MainThreadControl.o: internals/MainThreadControl.cpp internals/MainThreadControl.hpp
 	cd ./internals && $(COMPILE) $(INCPATH) -c MainThreadControl.cpp
+internals/RobotState.o: internals/RobotState.cpp internals/RobotState.hpp
+	cd ./internals && $(COMPILE) $(INCPATH) -c RobotState.cpp
 	
 ### VISION LIBS ####################
 vision/Camera.o: vision/Camera.cpp vision/Camera.hpp

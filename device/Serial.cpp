@@ -1,4 +1,3 @@
-
 #include "Serial.hpp"
 #include "../controller/SerialThread.hpp"
 #include <unistd.h>	// UNIX standard functions
@@ -8,7 +7,6 @@
 #include <sys/select.h> // select
 #include <stdexcept>
 #include <math.h> // abs
-
 
 namespace Device {
 
