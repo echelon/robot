@@ -3,6 +3,7 @@
  */
 #include "../../controller/KeyboardThread.hpp"
 #include "../../controller/XboxThread.hpp"
+#include "../../controller/RobotThread.hpp"
 #include "../../device/RCSerializer.hpp"
 #include "../../internals/MainThreadControl.hpp"
 #include "../../internals/RobotState.hpp"
@@ -12,16 +13,18 @@
 
 int main(int argc, char** argv)
 {
-	Device::RCSerializer* serial = new Device::RCSerializer(true);
+	Device::RCSerializer* serial = new Device::RCSerializer(false);
 	serial->open();
 
-	Internals::RobotState* robotState = new Internals::RobotState();
+	Internals::RobotState* state = new Internals::RobotState();
 
 	Controller::KeyboardThread keyboardThread(serial);
-	Controller::XboxThread xboxThread(serial);
+	Controller::XboxThread xboxThread(serial, state);
+	Controller::RobotThread robotThread(serial, state);
 	
 	keyboardThread.start();
 	xboxThread.start();
+	robotThread.start();
 
 	Internals::MainThreadControl::wait();
 

@@ -2,6 +2,7 @@
 #define CONTROLLER_XBOXTHREAD_H
 
 #include "../internals/Thread.hpp"
+#include "../internals/RobotState.hpp"
 #include "../device/Joystick.hpp"
 #include "../device/RCSerializer.hpp"
 
@@ -16,7 +17,7 @@ class XboxThread: public Internals::Thread
 		/**
 		 * Constructor
 		 */
-		XboxThread(Device::RCSerializer* ser);
+		XboxThread(Device::RCSerializer* ser, Internals::RobotState* rs);
 
 		/**
 		 * Destructor
@@ -64,6 +65,11 @@ class XboxThread: public Internals::Thread
 		 * Provides joystick access.
 		 */
 		Device::Joystick* joystick;
+
+		/**
+		 * Robot state.
+		 */
+		Internals::RobotState* state;
 };
 }
 #endif

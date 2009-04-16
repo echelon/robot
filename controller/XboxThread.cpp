@@ -6,9 +6,10 @@ namespace Controller {
 const int XboxThread::MAX_AXIS = 32767;
 const int XboxThread::MIN_AXIS = -32767;
 
-XboxThread::XboxThread(Device::RCSerializer* ser)
+XboxThread::XboxThread(Device::RCSerializer* ser, Internals::RobotState* rs)
 {
 	serial = ser;
+	state = rs;
 }
 
 XboxThread::~XboxThread()
@@ -29,13 +30,13 @@ void XboxThread::destroy()
 
 void XboxThread::execute(void*)
 {
-	if(!serial->isOpen()) {
+	/*if(!serial->isOpen()) {
 		serial->open();
 		if(!serial->isOpen()) {
 			printf("Serial not open... ending xbox controller thread\n");
 			return;
 		}
-	}
+	}*/
 
 	if(!joystick->isOpen()) {
 		printf("Couldn't establish connection with Xbox controller... abort\n");
@@ -51,14 +52,18 @@ void XboxThread::execute(void*)
 		}
 
 		if(joystick->getLogoButton()) {
-			serial->mogo(0,0);
-			serial->stop();
+			state->stopMotors();
+			state->stopBlink();
+			//serial->mogo(0,0);
+			//serial->stop();
 			break;
 		}
 
 		if(joystick->getBButton()) {
-			serial->mogo(0,0);
-			serial->stop();
+			state->stopMotors();
+			state->stopBlink();
+			//serial->mogo(0,0);
+			//serial->stop();
 			continue;
 		}
 
@@ -88,8 +93,10 @@ void XboxThread::execute(void*)
 
 		//joystick->printStatus();
 
-		serial->mogo(rspeed, lspeed);
+		//serial->mogo(rspeed, lspeed);
 		//serial->blink(lblink, rblink);
+
+		state->setMotors(rspeed, lspeed);
 	}
 }
 

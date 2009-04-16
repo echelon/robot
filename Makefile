@@ -51,12 +51,14 @@ Projects/laser/main.o: Projects/laser/main.cpp
 motor: Projects/motor/main.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
 	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
-	controller/KeyboardThread.o controller/XboxThread.o controller/SerialThread.o
+	controller/KeyboardThread.o controller/XboxThread.o controller/SerialThread.o \
+	controller/RobotThread.o
 	@echo "== Linking Motor =="
 	$(LINK) Projects/motor/main.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
 	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/SerialThread.o \
+	controller/RobotThread.o \
 	$(LIBS) -o motor
 	@echo "========== Motor compile SUCCESS! =========="
 	
@@ -71,6 +73,8 @@ controller/XboxThread.o: controller/XboxThread.cpp controller/XboxThread.hpp
 	cd ./controller && $(COMPILE) $(INCPATH) -c XboxThread.cpp
 controller/SerialThread.o: controller/SerialThread.cpp controller/SerialThread.hpp
 	cd ./controller && $(COMPILE) $(INCPATH) -c SerialThread.cpp
+controller/RobotThread.o: controller/RobotThread.cpp controller/RobotThread.hpp
+	cd ./controller && $(COMPILE) $(INCPATH) -c RobotThread.cpp
 
 ### DEVICE LIBS ####################
 device/Joystick.o: device/Joystick.cpp device/Joystick.hpp
