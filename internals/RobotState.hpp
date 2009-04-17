@@ -53,7 +53,8 @@ class RobotState
 		 * Note that a state was used correctly.
 		 */
 		void setStateWritten(robot_state_t st);
-		//void setBlinkWritten();
+
+		void printState();
 
 	private:
 		robot_state_t state;

@@ -39,6 +39,7 @@ void KeyboardThread::execute(void*)
 			if (lastCh == ch) {
 				continue;
 			}
+			printf("KeyboardThread, new state.\n");
 			
 			switch(ch) {
 				case 49: // 1

@@ -107,12 +107,13 @@ void RobotState::setStateWritten(robot_state_t st)
 	pthread_mutex_unlock(&mutex);
 }
 
-
-/*void RobotState::setBlinkWritten()
+void RobotState::printState()
 {
-	pthread_mutex_lock(&mutex);
-	state.blinkWritten = true;
-	pthread_mutex_unlock(&mutex);
-}*/
+	printf("==== ROBOT STATE ====\n");
+	printf("Motor 1: %d (%d old)\n", state.m1, state.writtenM1);
+	printf("Motor 2: %d (%d old)\n", state.m2, state.writtenM2);
+	printf("Blink 1: %d (%d old)\n", state.l1, state.writtenL1);
+	printf("Blink 2: %d (%d old)\n\n", state.l2, state.writtenL2);
+}
 
 } // end namespace

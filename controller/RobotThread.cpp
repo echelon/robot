@@ -36,12 +36,14 @@ void RobotThread::execute(void*)
 		}
 	}
 
-	//Internals::robot_state_t lastState;
+	Internals::robot_state_t curState;
+	Internals::robot_state_t lastState;
 	//bool motorSent = false;
 	//bool blinkSent = false;
 
 	while(!stopFlag) {
-		Internals::robot_state_t curState = state->getState();
+		lastState = curState;
+		curState = state->getState();
 
 		// Motor
 		if(!curState.isMotorWritten()) {
@@ -72,6 +74,7 @@ void RobotThread::execute(void*)
 			}
 			continue;
 		}
+
 	} // end mainloop
 }
 
