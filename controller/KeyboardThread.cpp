@@ -1,11 +1,12 @@
 #include "KeyboardThread.hpp"
 #include "../internals/MainThreadControl.hpp"
+#include <stdio.h>
 
 namespace Controller {
 
-KeyboardThread::KeyboardThread(Device::RCSerializer* ser): Thread()
+KeyboardThread::KeyboardThread(Internals::RobotState* rs): Thread()
 {
-	serial = ser;
+	state = rs;
 }
 
 KeyboardThread::~KeyboardThread()
@@ -26,113 +27,96 @@ void KeyboardThread::destroy()
 
 void KeyboardThread::execute(void*)
 {
-	if(!serial->isOpen()) {
-		serial->open();
-		if(!serial->isOpen()) {
-			printf("Serial not open... ending keyboard thread\n");
-			return;
-		}
-	}
-
 	int ch;
+	int lastCh;
 	char* read;
 
 	while(!stopFlag) {
 		if(keyboard->kbhit()) {
+			lastCh = ch;
 			ch = keyboard->getch();
+
+			if (lastCh == ch) {
+				continue;
+			}
 			
 			switch(ch) {
 				case 49: // 1
-					serial->blink(0,0);
-					printf("Blink 0 0\n");
+					state->setBlink(0,0);
 					break;
 				case 50: // 2
-					serial->blink(-1,50);
-					printf("Blink 0 50\n");
+					state->setBlink(0,50);
 					break;
 				case 51: // 3
-					serial->blink(50);
-					printf("Blink 50 0\n");
+					state->setBlink(50,0);
 					break;
 				case 52: // 4
-					serial->blink(-1,100);
-					printf("Blink 50 50\n");
+					state->setBlink(0,100);
 					break;
 				case 53: // 5
-					serial->blink(100);
-					printf("Blink 50 50\n");
+					state->setBlink(100,0);
 					break;
-
-
 				case 119: // w - forward						
-					serial->mogo(100, 100);
-					printf("Forward\n");
+					state->setMotors(100, 100);
 					break;
-
 				case 97: // a - left
-					printf("Left\n");
-					serial->mogo(-100, 100);
+					state->setMotors(-100, 100);
 					break;
 
 				case 100: // d - right
-					//serial->mogo(5,-5);
-					printf("Right\n");
-					serial->mogo(100, -100);
+					state->setMotors(100, -100);
 					break;
 
 				case 115: // s - back
-					//serial->mogo(-5,-5);
-					printf("Back\n");
-					serial->mogo(-100, -100);
+					state->setMotors(-100, -100);
 					break;
 
 				case 120: // x - stop
-					printf("Stop\n");
-					serial->stop();
+					printf("KeyboardThread, Stop\n");
+					state->stopMotors();
 					break;
 
-				case 102: // f - fw
-					printf("Firmware\n");
-					read = serial->fw();
-					printf("%s\n", read);
+				case 102: // f - fw // TODO
+					//printf("Firmware\n");
+					//read = serial->fw();
+					//printf("%s\n", read);
 					break;
 
-				case 98: // b - battery
-					printf("Battery\n");
-					read = serial->battery();
-					printf("%s\n", read);
+				case 98: // b - battery // TODO
+					//printf("Battery\n");
+					//read = serial->battery();
+					//printf("%s\n", read);
 					break;
 
-				case 114: // r- read
-					printf("Read\n");
-					read = serial->read();
-					printf("Read:%s\n", read);
+				case 114: // r- read TODO
+					//printf("Read\n");
+					//read = serial->read();
+					//printf("Read:%s\n", read);
 					break;
 
 				case 112: // p - purge/clear I/O queues
 				case 99:  // c
-					printf("Flush I/O queues\n");
-					serial->flush();
+					//printf("Flush I/O queues\n");
+					//serial->flush();
 					break;
 
 				case 110: // n
-					printf("Nonsense input command and read\n");
-					serial->write("asdfjhk\r");
-					read = serial->read();
-					printf("Read:%s\n", read);
+					//printf("Nonsense input command and read\n");
+					//serial->write("asdfjhk\r");
+					//read = serial->read();
+					//printf("Read:%s\n", read);
 					break;
 
 				case 109: // m
-					printf("Nonsense input command WITHOUT read\n");
-					serial->write("asdfjhk\r");
+					//printf("Nonsense input command WITHOUT read\n");
+					//serial->write("asdfjhk\r");
 					break;
 
 				case 113: // q
 				case 27: // escape - quit
 				case 96: // tilde - quit
-					printf("Quit\n");
-					serial->mogo(0, 0);
-					serial->stop();
+					printf("KeyboardThread, Quit\n");
+					state->stopMotors();
 					stop();
 					break;
 
@@ -140,9 +124,8 @@ void KeyboardThread::execute(void*)
 					printf("Unknown key %d\n", ch);
 					break;
 			}
-			ch = 0;
+			//ch = 0;
 		}
-		//serial->Read();
 	}
 }
 

@@ -15,11 +15,6 @@
 #include <stropts.h> // ioctl
 #include <time.h>
 
-// Forward declarations
-namespace Controller {
-	class SerialThread;
-}
-
 namespace Device {
 /**
  * Serial
@@ -32,7 +27,7 @@ class Serial
 		/**
 		 * Default constructor
 		 */
-		Serial(bool useThread = false);
+		Serial();
 
 		/**
 		 * Destructor - calls close
@@ -70,9 +65,9 @@ class Serial
 		 * Write a specified number of bytes of a character buffer 
 		 * to the line.
 		 * @priority messages skip ahead in queues (if any) and don't get rejected
-		 * @bypassQueue only matters if the queue thread is enabled
+		 * @return bool wasWritten
 		 */
-		void write(const char* data, bool priority = false, bool bypassQueue = false); 
+		bool write(const char* data, bool priority = false); 
 
 		/**
 		 * Write to the line, then read the response.
@@ -106,16 +101,6 @@ class Serial
 		 * Mutex for writing/reading the line
 		 */
 		static pthread_mutex_t lineMutex;
-
-		/**
-		 * Optional SerialThread to manage queued messages.
-		 */
-		Controller::SerialThread* serialThread;
-
-		/**
-		 * Using serial thread?
-		 */
-		bool isUsingThread;
 
 };
 }

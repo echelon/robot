@@ -2,8 +2,8 @@
 #define CONTROLLER_KEYBOARDTHREAD_H
 
 #include "../internals/Thread.hpp"
+#include "../internals/RobotState.hpp"
 #include "../device/Keyboard.hpp"
-#include "../device/RCSerializer.hpp"
 
 // TODO: Move to namespace Controller
 
@@ -15,7 +15,7 @@ namespace Controller {
 class KeyboardThread: public Internals::Thread
 {
 	public:
-		KeyboardThread(Device::RCSerializer* ser);
+		KeyboardThread(Internals::RobotState* rs);
 		~KeyboardThread();
 
 	protected:
@@ -24,7 +24,7 @@ class KeyboardThread: public Internals::Thread
 		void execute(void*);
 
 	private:
-		Device::RCSerializer* serial;
+		Internals::RobotState* state;
 		Device::Keyboard* keyboard;
 
 };

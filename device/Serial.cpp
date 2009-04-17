@@ -1,5 +1,4 @@
 #include "Serial.hpp"
-#include "../controller/SerialThread.hpp"
 #include <unistd.h>	// UNIX standard functions
 #include <fcntl.h> // file control
 #include <string.h> // using strlen
@@ -12,24 +11,15 @@ namespace Device {
 
 pthread_mutex_t Serial::lineMutex = PTHREAD_MUTEX_INITIALIZER;
 
-Serial::Serial(bool useThread):
-	fd(0),
-	isUsingThread(false)
+Serial::Serial():
+	fd(0)
 {
-	if(useThread) {
-		printf("Creating SerialThead instance.\n");
-		isUsingThread = true;
-		serialThread = new Controller::SerialThread(this);
-	}
+	// nothing
 }
 
 Serial::~Serial()
 {
 	close();
-
-	if(isUsingThread) {
-		delete serialThread;
-	}
 }
 
 void Serial::open() // named to avoid clashes
@@ -116,7 +106,8 @@ int Serial::select(int nanoseconds, int seconds)
 	tv.tv_sec = seconds;
 	tv.tv_usec = nanoseconds;
 
-	int r = ::select(fd+1, &rfds, 0, 0, &tv);
+	//int r = ::select(fd+1, &rfds, 0, 0, &tv);
+	::select(fd+1, &rfds, 0, 0, &tv);
 
 	return 1; // TODO: Recent error with select. WTF is going on?
 }
@@ -124,19 +115,12 @@ int Serial::select(int nanoseconds, int seconds)
 
 // TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
 // What about flush, etc?
-void Serial::write(const char* data, bool priority, bool bypassQueue)
+bool Serial::write(const char* data, bool priority)
 {
 	if(!isOpen()) {
 		// TODO: throw exception
-		printf("Writing to a non-open file.\n");
-		return;
-	}
-
-	// Queue messages
-	if(isUsingThread && !bypassQueue) {
-		serialThread->enqueue((char*)data, priority);
-		serialThread->start();
-		return;
+		printf("Serial, Writing to a non-open file.\n");
+		return false;
 	}
 
 	if(!priority) {
@@ -144,12 +128,12 @@ void Serial::write(const char* data, bool priority, bool bypassQueue)
 		clock_gettime(CLOCK_REALTIME, &curTime);
 
 		long secDif = curTime.tv_sec - lastWrite.tv_sec;
-		if(secDif < 1) {
-			printf("Sec difference < 2. Ignoring.\n");
-			return;
+		if(secDif == 0) {
+			printf("Serial, Sec difference==0. Ignoring.\n");
+			return false;
 		}
 	}
-	printf("commit message\n");
+	printf("Serial, ATTEMPT WRITE\n");
 
 	/*long last = ((lastWrite.tv_sec%10) * 10000) + (int)(lastWrite.tv_nsec/chopDigits);
 	long cur = ((curTime.tv_sec%10) * 10000) + (int)(curTime.tv_nsec/chopDigits);
@@ -187,12 +171,12 @@ void Serial::write(const char* data, bool priority, bool bypassQueue)
 		//int r = Select();
 		int r = 1; // TODO: Huge problem with select. It used to work...
 		if(r < 0) {
-			printf("Error with select()\n");
-			return; // TODO: exception
+			printf("Serial, Error with select()\n");
+			return false; // TODO: exception
 		}
 		else if(r == 0) {
-			printf("Line not available.\n");
-			return; // Didn't become available
+			printf("Serial, Line not available.\n");
+			return false; // Didn't become available
 		}
 
 		int written = ::write(fd, buff.c_str(), len);
@@ -209,6 +193,9 @@ void Serial::write(const char* data, bool priority, bool bypassQueue)
 		}*/
 	}
 	clock_gettime(CLOCK_REALTIME, &lastWrite);
+
+	printf("Serial, WRITE \"COMMITTED\"!\n");
+	return true;
 }
 
 

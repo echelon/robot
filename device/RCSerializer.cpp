@@ -4,7 +4,7 @@
 
 namespace Device {
 
-RCSerializer::RCSerializer(bool useThread) : Serial(useThread)
+RCSerializer::RCSerializer() : Serial()
 {
 	// nothing
 }
@@ -12,10 +12,6 @@ RCSerializer::RCSerializer(bool useThread) : Serial(useThread)
 RCSerializer::~RCSerializer()
 {
 	close();
-
-	if(isUsingThread) {
-		delete serialThread;
-	}
 }
 
 char* RCSerializer::fw()
@@ -40,17 +36,16 @@ char* RCSerializer::battery()
 	return ret;
 }
 
-void RCSerializer::mogo(int m1, int m2)
+bool RCSerializer::mogo(int m1, int m2)
 {
 	if(m1 == 0 && m2 == 0) {
-		stop(); // send prioritized stop message instead
-		return;
+		return stop(); // send prioritized stop message instead
 	}
 
 	char buff[50];
 
 	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
-	write((const char*)buff);
+	return write((const char*)buff);
 }
 
 /*void RCSerializer::mogoPercent(double m1, double m2)
@@ -65,18 +60,18 @@ void RCSerializer::mogo(int m1, int m2)
 	write((const char*)buff);
 }*/
 
-void RCSerializer::blink(int r1, int r2)
+bool RCSerializer::blink(int r1, int r2)
 {
 	char buff[50];
 
 	if(r1 < 0 && r2 < 0) {
 		printf("Blink rates need to be set\n");
-		return;
+		return false;
 	}
 
 	if(r1 > 127 || r2 > 127) {
 		printf("Blink rates out of bounds\n");
-		return;
+		return false;
 	}
 
 	if(r1 >= 0 && r2 < 0) {
@@ -89,13 +84,12 @@ void RCSerializer::blink(int r1, int r2)
 		sprintf(buff, "blink 1:%d 2:%d\r", r1, r2);
 	}
 
- 	write((const char*)buff);
-
+ 	return write((const char*)buff);
 }
 
-void RCSerializer::stop()
+bool RCSerializer::stop()
 {
-	write("stop\r", true);
+	return write("stop\r", true);
 }
 
 } // end namespace

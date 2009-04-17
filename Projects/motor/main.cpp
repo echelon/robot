@@ -13,13 +13,13 @@
 
 int main(int argc, char** argv)
 {
-	Device::RCSerializer* serial = new Device::RCSerializer(false);
+	Device::RCSerializer* serial = new Device::RCSerializer();
+	Internals::RobotState* state = new Internals::RobotState();
 	serial->open();
 
-	Internals::RobotState* state = new Internals::RobotState();
+	Controller::KeyboardThread keyboardThread(state);
+	Controller::XboxThread xboxThread(state);
 
-	Controller::KeyboardThread keyboardThread(serial);
-	Controller::XboxThread xboxThread(serial, state);
 	Controller::RobotThread robotThread(serial, state);
 	
 	keyboardThread.start();

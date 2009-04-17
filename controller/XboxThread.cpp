@@ -6,9 +6,8 @@ namespace Controller {
 const int XboxThread::MAX_AXIS = 32767;
 const int XboxThread::MIN_AXIS = -32767;
 
-XboxThread::XboxThread(Device::RCSerializer* ser, Internals::RobotState* rs)
+XboxThread::XboxThread(Internals::RobotState* rs)
 {
-	serial = ser;
 	state = rs;
 }
 
@@ -30,14 +29,6 @@ void XboxThread::destroy()
 
 void XboxThread::execute(void*)
 {
-	/*if(!serial->isOpen()) {
-		serial->open();
-		if(!serial->isOpen()) {
-			printf("Serial not open... ending xbox controller thread\n");
-			return;
-		}
-	}*/
-
 	if(!joystick->isOpen()) {
 		printf("Couldn't establish connection with Xbox controller... abort\n");
 		return;
@@ -54,16 +45,12 @@ void XboxThread::execute(void*)
 		if(joystick->getLogoButton()) {
 			state->stopMotors();
 			state->stopBlink();
-			//serial->mogo(0,0);
-			//serial->stop();
 			break;
 		}
 
 		if(joystick->getBButton()) {
 			state->stopMotors();
 			state->stopBlink();
-			//serial->mogo(0,0);
-			//serial->stop();
 			continue;
 		}
 
@@ -75,7 +62,7 @@ void XboxThread::execute(void*)
 		double ryp = -1* ((double)ry/MAX_AXIS);
 
 		
-		int fullSpeed = 300; // TODO - blinking lights
+		int fullSpeed = 300;
 
 		// TODO: TEMP - ABSOLUTE VALUE FUNCTION. 
 		// Testing with lights instead of motor. (LED uses positive vals only)
@@ -89,12 +76,9 @@ void XboxThread::execute(void*)
 		int lspeed = (int)(lyp*fullSpeed);
 		int rspeed = (int)(ryp*fullSpeed);
 
-		printf("LS: %d RS: %d\n", lspeed, rspeed);
+		printf("XboxThread, LS: %d RS: %d\n", lspeed, rspeed);
 
 		//joystick->printStatus();
-
-		//serial->mogo(rspeed, lspeed);
-		//serial->blink(lblink, rblink);
 
 		state->setMotors(rspeed, lspeed);
 	}

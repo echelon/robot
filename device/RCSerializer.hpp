@@ -28,7 +28,7 @@ class RCSerializer: public Serial
 		/**
 		 * Default constructor
 		 */
-		RCSerializer(bool useThread = false);
+		RCSerializer();
 
 		/**
 		 * Destructor - calls close
@@ -48,18 +48,18 @@ class RCSerializer: public Serial
 		/**
 		 * Issue a motor speed command
 		 */
-		void mogo(int m1, int m2);
+		bool mogo(int m1, int m2);
 
 		/**
 		 * Blink the two LEDs
 		 * Set only the LED that is meant to be turned on. 
 		 */
-		void blink(int r1 = -1, int r2 = -1);
+		bool blink(int r1 = -1, int r2 = -1);
 
 		/**
 		 * Stop the motor.
 		 */
-		void stop();
+		bool stop();
 
 	private:
 };

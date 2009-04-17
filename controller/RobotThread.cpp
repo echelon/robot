@@ -36,25 +36,43 @@ void RobotThread::execute(void*)
 		}
 	}
 
-	Internals::robot_state_t lastState;
-	bool motorSent = false;
-	bool blinkSent = false;
+	//Internals::robot_state_t lastState;
+	//bool motorSent = false;
+	//bool blinkSent = false;
 
 	while(!stopFlag) {
 		Internals::robot_state_t curState = state->getState();
 
-		if(lastState.m1 != curState.m1 || lastState.m2 != curState.m2) {
-			serial->mogo(curState.m1, curState.m2);
+		// Motor
+		if(!curState.isMotorWritten()) {
+			printf("RobotThread, attempting to mogo(%d, %d)...\n", 
+				curState.m1, curState.m2);
+			bool written = serial->mogo(curState.m1, curState.m2);
+			if(written) {
+				printf("RobotThread, motor state was written!\n");
+				state->setStateWritten(curState);
+			}
+			else {
+				printf("RobotThread, MOTOR STATE WAS NOT WRITTEN\n");
+			}
+			continue;
 		}
-		/*if(lastState.l1 != curState.l1 || lastState.l2 != curState.l2) {
-			serial->blink(curState.l1, curState.l2);
-		}*/
 
-		lastState.m1 = curState.m1;
-		lastState.m2 = curState.m2;
-		lastState.l1 = curState.l1;
-		lastState.l2 = curState.l2;
-	}
+		// Blink
+		if(!curState.isBlinkWritten()) {
+			printf("RobotThread, attempting to blink(%d, %d)...\n", 
+				curState.l1, curState.l2);
+			bool written = serial->blink(curState.l1, curState.l2);
+			if(written) {
+				printf("RobotThread, blink state was written!\n");
+				state->setStateWritten(curState);
+			}
+			else {
+				printf("RobotThread, BLINK STATE WAS NOT WRITTEN\n");
+			}
+			continue;
+		}
+	} // end mainloop
 }
 
 

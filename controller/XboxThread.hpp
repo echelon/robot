@@ -4,7 +4,6 @@
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
 #include "../device/Joystick.hpp"
-#include "../device/RCSerializer.hpp"
 
 namespace Controller {
 
@@ -17,7 +16,7 @@ class XboxThread: public Internals::Thread
 		/**
 		 * Constructor
 		 */
-		XboxThread(Device::RCSerializer* ser, Internals::RobotState* rs);
+		XboxThread( Internals::RobotState* rs);
 
 		/**
 		 * Destructor
@@ -56,11 +55,6 @@ class XboxThread: public Internals::Thread
 		void execute(void*);
 
 	private:
-		/**
-		 * The RCSerializer instance to use.
-		 */
-		Device::RCSerializer* serial;
-
 		/**
 		 * Provides joystick access.
 		 */
