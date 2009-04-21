@@ -123,120 +123,93 @@ int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, b
 	return r;
 }
 
+char* Serial::read(int bytes)
+{
+	if(!isOpen()) {
+		printf("Serial, Can't read from a non-open file.\n");
+		return 0;
+	}
+
+	pthread_mutex_lock(&mutex);
+	char* ret = doRead(bytes);
+	flush(); // TODO (Not working): First motor command on program run fails.
+	pthread_mutex_unlock(&mutex);
+
+
+	return ret;
+}
+
 bool Serial::write(const char* data, bool priority)
 {
-	printf("Serial::write, Attempt to write:\n\t%s\n", data);
 	if(!isOpen()) {
 		printf("Serial, Can't write to a non-open file.\n");
 		return false;
 	}
 
-	//
-	// TIMING
-	//
-
-	/*if(!priority) {
-		timespec curTime;
-		clock_gettime(CLOCK_REALTIME, &curTime);
-
-		long secDif = curTime.tv_sec - lastWrite.tv_sec;
-		if(secDif == 0) {
-			printf("Serial, Sec difference==0. Ignoring.\n");
-			return false;
-		}
-	}
-	printf("Serial, ATTEMPT WRITE\n");*/
-
-	/*long last = ((lastWrite.tv_sec%10) * 10000) + (int)(lastWrite.tv_nsec/chopDigits);
-	long cur = ((curTime.tv_sec%10) * 10000) + (int)(curTime.tv_nsec/chopDigits);
-
-	printf("Last: %d . %d\n", lastWrite.tv_sec, lastWrite.tv_nsec);
-	printf("Last: %d\n", last);
-	printf("Cur: %d . %d\n", curTime.tv_sec, curTime.tv_nsec);
-	printf("Cur: %d\n", cur);
-
-	if(lastWrite.tv_sec == curTime.tv_sec) {
-		long dif = curTime.tv_nsec - lastWrite.tv_nsec;
-		if(dif < 1000) {
-			printf("Line busy. Write blocked.\n");
-			return;
-		}
-	}
-	else if(lastWrite.tv_sec == curTime.tv_sec-1) {
-		long dif = lastWrite.tv_nsec - curTime.tv_nsec;
-		if(dif < 1000) {
-			printf("Line busy. Write blocked. (2)\n");
-			return;
-		}
-
-	}
-	printf("GOING AHEAD WITH WRITE...\n");*/
-
-	//
-	// WRITE
-	//
-
+	pthread_mutex_lock(&mutex);
+	bool ret = doWrite(data, priority);
 	flush(); // TODO (Not working): First motor command on program run fails.
+	pthread_mutex_unlock(&mutex);
 
-	std::string buff(data);
-	int len = buff.length();
+	return ret;
+}
+
+char* Serial::writeRead(const char* inBuff, int readBytes)
+{
+	bool  wrRet;
+	char* rdRet;
+
+	// TODO/FIXME
+	// This is a bad idea if multiple threads can write/read at the same time!
 
 	pthread_mutex_lock(&mutex);
-	while(len > 0) 
-	{
-		int r = select(60500, 0, false, true, false);
-		if(r < 0) {
-			printf("Serial, Error with select()\n");
-			return false;
-		}
-		else if(r == 0) {
-			printf("Serial, LINE NOT AVAILABLE!!!!!\n");
-			return false;
-		}
+	wrRet = doWrite(inBuff);
 
-		int written = ::write(fd, buff.c_str(), len);
-		buff.erase(0, written);
-		len -= written;
+	if(!wrRet) {
+		pthread_mutex_unlock(&mutex);
+		printf("Serial::writeRead, DID NOT WRITE\n"); // keep
+		return 0;
 	}
-	pthread_mutex_unlock(&mutex);
-	clock_gettime(CLOCK_REALTIME, &lastWrite);
 
-	printf("Serial, WRITE \"COMMITTED\"! Data: \n\t%s\n", data);
-	return true;
+	rdRet = (char*)doRead(readBytes);
+	flush(); // TODO (Not working): First motor command on program run fails.
+
+	pthread_mutex_unlock(&mutex);
+	
+	return rdRet;
 }
 
 
-char* Serial::read(int bytes)
+char* Serial::doRead(int bytes)
 {
-	if(!isOpen()) {
-		return 0;
-	}
-
 	if(bytes < 1) {
 		return 0;
 	}
-	printf("Testing\n");
+	printf("Serial::doRead, Testing read of %d bytes\n", bytes);
 
 	std::string buff;
-
 	int failcnt = 0;
-	while(buff.length() < bytes) {
 
-		int r = select();
+	while(buff.length() < bytes) 
+	{
+		int r = select(50500, 0, true, false, false);
+		printf("Serial::doRead, select value: %d\n", r); // TODO TEMP
 		if(r < 0) {
-			printf("Error with select()\n");
-			return 0; // TODO: exception
+			printf("Serial::doRead, Error with select()\n");
+			return 0; // TODO EXCEPTION
 		}
 		else if(r == 0) {
-			printf("Line not available.\n");
-			break; // Didn't become available
+			printf("Serial::doRead, LINE NOT AVAILABLE!!!!\n");
+			break;
 		}
 
 		char rbuf[1000];
 		int re = ::read(fd, rbuf, bytes-buff.length());
 		if(!re) {
+			printf("Serial::doRead, READ FAILED. Curcount: %d\n", failcnt); // TODO TEMP
 			if(failcnt >= 5) {
-				break;
+				printf("Serial::read, Fail count over 5.\n");
+				return 0; // DON'T RETURN PARTIAL DATA :(
 			}
 			failcnt++;
 			continue;
@@ -248,15 +221,47 @@ char* Serial::read(int bytes)
 		// TODO NOTE: PySerial had an additional check here for timeouts.
 		// I think my code is fine, but if errors occur this may be a reason.
 	}
-	tcflush(fd, TCIOFLUSH);
+	//tcflush(fd, TCIOFLUSH);
 
-	printf("Read from line:\n==============\n%s\n==============\n\n", buff.c_str());
+	printf("Serial::doRead, about to print read data...\n"); // TODO TEMP
+	
+ 	const char* retch = buff.c_str();
+	printf("Read from line:\n==============\n%s\n==============\n\n",retch);
 	return (char*)buff.c_str();
 }
 
-char* Serial::writeRead(const char* inBuff, int writeBytes, int readBytes)
+bool Serial::doWrite(const char* data, bool priority)
 {
-	return 0;
+	printf("Serial::doWrite, Attempt to write:\n\t%s\n", data);
+	//
+	// TODO/NOTE: Timing was removed. Can see old code in diffs.
+	//
+
+	std::string buff(data);
+	int len = buff.length();
+
+	while(len > 0) 
+	{
+		int r = select(60500, 0, false, true, false);
+		if(r < 0) {
+			printf("Serial::doWrite, Error with select()\n");
+			return false; // TODO EXCEPTION
+		}
+		else if(r == 0) {
+			printf("Serial::doWrite, LINE NOT AVAILABLE!!!!!\n");
+			return false;
+		}
+
+		int written = ::write(fd, buff.c_str(), len);
+		buff.erase(0, written);
+		len -= written;
+	}
+	clock_gettime(CLOCK_REALTIME, &lastWrite);
+
+	printf("Serial::doWrite, WRITE \"COMMITTED\"! Data: \n\t%s\n", data);
+	return true;
 }
+
+
 
 } // end namespace

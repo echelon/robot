@@ -72,13 +72,13 @@ class Serial
 		/**
 		 * Write to the line, then read the response.
 		 */
-		char* writeRead(const char* inBuff, int writeBytes = 1000, int readBytes = 1000);
+		char* writeRead(const char* inBuff, int readBytes = 1000);
 
 		char* test(const char* input);
 
 	protected:
 		/**
-		 * Wait for the line to open.
+		 * Wait for the line to open in given time, a non-blocking select.
 		 */
 		int select(
 			int microseconds = 0, // 50500
@@ -107,6 +107,15 @@ class Serial
 		 * Mutex on read/write
 		 */
 		pthread_mutex_t mutex;
+
+	private:
+
+		/**
+		 * Helper methods perform the actual read/write WITHOUT locking.
+		 * By doing this, mutexes can be used in read(), write(), and writeRead().
+		 */
+		char* doRead(int bytes = 1000);
+		bool doWrite(const char* data, bool priority = false); 
 
 };
 }

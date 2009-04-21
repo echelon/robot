@@ -43,9 +43,20 @@ bool RCSerializer::mogo(int m1, int m2)
 	}
 
 	char buff[50];
-
 	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
-	return write((const char*)buff);
+
+	//return write((const char*)buff);
+
+	char* read = writeRead((const char*)buff);
+
+
+	printf("RCSerializer::mogo, READ:\n\t...\n%s\n\t...\n", (const char*)read);
+
+	if(read == 0) {
+		printf("RCSerializer::mogo, FAILED TO READ\n"); // keep
+		return false; // TODO TEMP
+	}
+	return true; 
 }
 
 /*void RCSerializer::mogoPercent(double m1, double m2)
