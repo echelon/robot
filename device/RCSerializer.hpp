@@ -61,7 +61,11 @@ class RCSerializer: public Serial
 		 */
 		bool stop();
 
-	private:
+	protected:
+		/**
+		 * Helper function determines if responses were acknowledged.
+		 */
+		bool checkAck(char* read);
 };
 }
 #endif

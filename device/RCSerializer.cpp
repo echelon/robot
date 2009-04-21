@@ -1,6 +1,5 @@
 #include "RCSerializer.hpp"
-#include <string.h> // using strlen
-#include <errno.h> // errno
+#include <string.h> // using strstrs
 
 namespace Device {
 
@@ -39,22 +38,17 @@ char* RCSerializer::battery()
 bool RCSerializer::mogo(int m1, int m2)
 {
 	if(m1 == 0 && m2 == 0) {
-		return stop(); // send prioritized stop message instead
+		// send prioritized stop message instead
+		return stop(); 
 	}
 
 	char buff[50];
 	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
 
-	//return write((const char*)buff);
-
 	char* read = writeRead((const char*)buff);
 
-
-	printf("RCSerializer::mogo, READ:\n\t...\n%s\n\t...\n", (const char*)read);
-
-	if(read == 0) {
-		printf("RCSerializer::mogo, FAILED TO READ\n"); // keep
-		return false; // TODO TEMP
+	if(!checkAck(read)) {
+		return false;
 	}
 	return true; 
 }
@@ -100,7 +94,35 @@ bool RCSerializer::blink(int r1, int r2)
 
 bool RCSerializer::stop()
 {
-	return write("stop\r", true);
+	char* read = writeRead("stop\r");
+
+	if(!checkAck(read)) {
+		return false;
+	}
+	return true; 
 }
+
+bool RCSerializer::checkAck(char* read)
+{
+	const char* ack = strstr((const char*)read, "ACK\r\n>");
+	if(ack != 0) {
+		return true;
+	}
+
+	const char* nack = strstr((const char*)read, "NACK\r\n>");
+	if(nack != 0) {
+		printf("RCSerializer::checkAck, request generated a NACK response.\n");
+		return false;
+	}
+
+	if(read == 0) {
+		printf("RCSerializer::checkAck, no data was received in acknowledgement.\n");
+		return false;
+	}
+
+	printf("RCSerializer::checkAck, response recieved wasn't understood.\n");
+	return false;
+}
+
 
 } // end namespace
