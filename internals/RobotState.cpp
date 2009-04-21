@@ -100,6 +100,7 @@ robot_state_t RobotState::getState()
 
 void RobotState::setStateWritten(robot_state_t st)
 {
+	printf("RobotState, setStateWritten()\n");
 	pthread_mutex_lock(&mutex);
 	//state.stateWritten = st;
 	state.writtenM1 = st.m1;

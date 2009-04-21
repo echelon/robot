@@ -9,10 +9,9 @@
 
 namespace Device {
 
-pthread_mutex_t Serial::lineMutex = PTHREAD_MUTEX_INITIALIZER;
-
 Serial::Serial():
-	fd(0)
+	fd(0),
+	mutex((pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER)
 {
 	// nothing
 }
@@ -95,35 +94,48 @@ void Serial::flush(int queue)
 }
 
 
-int Serial::select(int nanoseconds, int seconds)
+int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, bool chkError)
 {
 	struct timeval tv;
-	fd_set rfds;
+	fd_set rfds; // Check if available to read
+	fd_set wfds; // Check if available to write
+	fd_set efds; // Check if an error condition is pending
 
 	FD_ZERO(&rfds);
-	FD_SET(fd, &rfds);
+	FD_ZERO(&wfds);
+	FD_ZERO(&efds);
+
+	if (chkRead) {
+		FD_SET(fd, &rfds);
+	}
+	if(chkWrite) {
+		FD_SET(fd, &wfds);
+	}
+	if(chkError) {
+		FD_SET(fd, &efds);
+	}
 
 	tv.tv_sec = seconds;
-	tv.tv_usec = nanoseconds;
+	tv.tv_usec = microseconds;
 
-	//int r = ::select(fd+1, &rfds, 0, 0, &tv);
-	::select(fd+1, &rfds, 0, 0, &tv);
+	int r = ::select(fd+1, &rfds, &wfds, &efds, &tv);
 
-	return 1; // TODO: Recent error with select. WTF is going on?
+	return r;
 }
 
-
-// TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
-// What about flush, etc?
 bool Serial::write(const char* data, bool priority)
 {
+	printf("Serial::write, Attempt to write:\n\t%s\n", data);
 	if(!isOpen()) {
-		// TODO: throw exception
-		printf("Serial, Writing to a non-open file.\n");
+		printf("Serial, Can't write to a non-open file.\n");
 		return false;
 	}
 
-	if(!priority) {
+	//
+	// TIMING
+	//
+
+	/*if(!priority) {
 		timespec curTime;
 		clock_gettime(CLOCK_REALTIME, &curTime);
 
@@ -133,7 +145,7 @@ bool Serial::write(const char* data, bool priority)
 			return false;
 		}
 	}
-	printf("Serial, ATTEMPT WRITE\n");
+	printf("Serial, ATTEMPT WRITE\n");*/
 
 	/*long last = ((lastWrite.tv_sec%10) * 10000) + (int)(lastWrite.tv_nsec/chopDigits);
 	long cur = ((curTime.tv_sec%10) * 10000) + (int)(curTime.tv_nsec/chopDigits);
@@ -160,51 +172,43 @@ bool Serial::write(const char* data, bool priority)
 	}
 	printf("GOING AHEAD WITH WRITE...\n");*/
 
+	//
+	// WRITE
+	//
 
 	flush(); // TODO (Not working): First motor command on program run fails.
 
 	std::string buff(data);
 	int len = buff.length();
 
-	while(len > 0) { // TODO: Wrap entire contents of while loop with try block
-
-		//int r = Select();
-		int r = 1; // TODO: Huge problem with select. It used to work...
+	pthread_mutex_lock(&mutex);
+	while(len > 0) 
+	{
+		int r = select(60500, 0, false, true, false);
 		if(r < 0) {
 			printf("Serial, Error with select()\n");
-			return false; // TODO: exception
+			return false;
 		}
 		else if(r == 0) {
-			printf("Serial, Line not available.\n");
-			return false; // Didn't become available
+			printf("Serial, LINE NOT AVAILABLE!!!!!\n");
+			return false;
 		}
 
 		int written = ::write(fd, buff.c_str(), len);
 		buff.erase(0, written);
 		len -= written;
-
-		/* TODO: if (self._timeout >= 0 or self._interCharTimeout > 0) and not buf:
-            break   # early abort on timeout*/
-		
-		/*TODO: catch Exception {
-       		if (errno != EAGAIN) {
-				// raise error
-			}
-		}*/
 	}
+	pthread_mutex_unlock(&mutex);
 	clock_gettime(CLOCK_REALTIME, &lastWrite);
 
-	printf("Serial, WRITE \"COMMITTED\"!\n");
+	printf("Serial, WRITE \"COMMITTED\"! Data: \n\t%s\n", data);
 	return true;
 }
 
 
-// TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
-// What about flush, etc?
 char* Serial::read(int bytes)
 {
 	if(!isOpen()) {
-		// TODO: throw exception
 		return 0;
 	}
 
@@ -250,8 +254,6 @@ char* Serial::read(int bytes)
 	return (char*)buff.c_str();
 }
 
-// TODO: Will calling writeRead() and Read()/Write() lead to a race condition with the locks?
-// What about flush, etc?
 char* Serial::writeRead(const char* inBuff, int writeBytes, int readBytes)
 {
 	return 0;

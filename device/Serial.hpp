@@ -80,7 +80,13 @@ class Serial
 		/**
 		 * Wait for the line to open.
 		 */
-		int select(int nanoseconds = 50500, int seconds = 0);
+		int select(
+			int microseconds = 0, // 50500
+			int seconds = 0, 
+			bool chkRead = false, 
+			bool chkWrite = false, 
+			bool chkError = false
+		);
 
 		/**
 		 * File descriptor of an open connection.
@@ -98,9 +104,9 @@ class Serial
 		timespec lastWrite;
 
 		/**
-		 * Mutex for writing/reading the line
+		 * Mutex on read/write
 		 */
-		static pthread_mutex_t lineMutex;
+		pthread_mutex_t mutex;
 
 };
 }

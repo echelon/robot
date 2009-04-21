@@ -5,7 +5,9 @@ RM = /bin/rm
 INCPATH = -I/usr/local/include/opencv -I/usr/local/include/libfeat
 LIBS = -L/usr/local/bin -lhighgui -lstdc++ -lpthread -lfeat
 
-all: laser motor sift
+all: 
+	@echo "Cannot compile all projects in development branch."
+	@echo "make [laser, motor, sift]"
 
 .PHONY: clean
 clean:
@@ -59,6 +61,8 @@ motor: Projects/motor/main.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/RobotThread.o \
 	$(LIBS) -o motor
 	@echo "========== Motor compile SUCCESS! =========="
+	@clear
+	@echo "Motor project compiled successfully."
 	
 Projects/motor/main.o: Projects/motor/main.cpp
 	@echo "== Compiling Motor =="
