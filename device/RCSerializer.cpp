@@ -1,5 +1,6 @@
 #include "RCSerializer.hpp"
-#include <string.h> // using strstrs
+#include <string.h>
+#include <stdio.h>
 
 namespace Device {
 

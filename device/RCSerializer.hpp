@@ -1,19 +1,6 @@
 #ifndef DEVICE_RCSERIALIZER_H
 #define DEVICE_RCSERIALIZER_H
 
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <termios.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pthread.h> // for mutex locks, eg as in fw()
-
-#include <iostream> // TODO: Test
-#include <fstream>
-
 #include "Serial.hpp"
 
 namespace Device {

@@ -1,11 +1,11 @@
 #include "Serial.hpp"
-#include <unistd.h>	// UNIX standard functions
+
 #include <fcntl.h> // file control
-#include <string.h> // using strlen
-#include <errno.h> // errno
-#include <sys/select.h> // select
+#include <sys/select.h> // select()
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>	// UNIX standard functions
 #include <stdexcept>
-#include <math.h> // abs
 
 namespace Device {
 
@@ -87,6 +87,7 @@ void Serial::close()
 
 void Serial::flush(int queue)
 {
+	// Flush input, output, or both
 	if(queue != TCIFLUSH && queue != TCOFLUSH && queue != TCIOFLUSH) {
 		queue = TCIOFLUSH;
 	}
@@ -97,9 +98,9 @@ void Serial::flush(int queue)
 int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, bool chkError)
 {
 	struct timeval tv;
-	fd_set rfds; // Check if available to read
-	fd_set wfds; // Check if available to write
-	fd_set efds; // Check if an error condition is pending
+	fd_set rfds; // Check if line is available to read
+	fd_set wfds; // Check if line is available to write
+	fd_set efds; // Check if line has an error condition pending
 
 	FD_ZERO(&rfds);
 	FD_ZERO(&wfds);
@@ -132,9 +133,8 @@ char* Serial::read(int bytes)
 
 	pthread_mutex_lock(&mutex);
 	char* ret = doRead(bytes);
-	flush(); // TODO (Not working): First motor command on program run fails.
+	flush(); // TODO (Still not working?)
 	pthread_mutex_unlock(&mutex);
-
 
 	return ret;
 }
@@ -148,7 +148,7 @@ bool Serial::write(const char* data, bool priority)
 
 	pthread_mutex_lock(&mutex);
 	bool ret = doWrite(data, priority);
-	flush(); // TODO (Not working): First motor command on program run fails.
+	flush(); // TODO (Still not working?)
 	pthread_mutex_unlock(&mutex);
 
 	return ret;
@@ -158,9 +158,6 @@ char* Serial::writeRead(const char* inBuff, int readBytes)
 {
 	bool  wrRet;
 	char* rdRet;
-
-	// TODO/FIXME
-	// This is a bad idea if multiple threads can write/read at the same time!
 
 	pthread_mutex_lock(&mutex);
 	wrRet = doWrite(inBuff);
@@ -172,7 +169,7 @@ char* Serial::writeRead(const char* inBuff, int readBytes)
 	}
 
 	rdRet = (char*)doRead(readBytes);
-	flush(); // TODO (Not working): First motor command on program run fails.
+	flush(); // TODO (Still not working?)
 
 	pthread_mutex_unlock(&mutex);
 	
@@ -185,7 +182,6 @@ char* Serial::doRead(int bytes)
 	if(bytes < 1) {
 		return 0;
 	}
-	printf("Serial::doRead, Testing read of %d bytes\n", bytes);
 
 	std::string buff;
 	int failcnt = 0;
@@ -193,7 +189,6 @@ char* Serial::doRead(int bytes)
 	while(buff.length() < bytes) 
 	{
 		int r = select(50500, 0, true, false, false);
-		printf("Serial::doRead, select value: %d\n", r); // TODO TEMP
 		if(r < 0) {
 			printf("Serial::doRead, Error with select()\n");
 			return 0; // TODO EXCEPTION
@@ -206,7 +201,6 @@ char* Serial::doRead(int bytes)
 		char rbuf[1000];
 		int re = ::read(fd, rbuf, bytes-buff.length());
 		if(!re) {
-			printf("Serial::doRead, READ FAILED. Curcount: %d\n", failcnt); // TODO TEMP
 			if(failcnt >= 5) {
 				printf("Serial::read, Fail count over 5.\n");
 				return 0; // DON'T RETURN PARTIAL DATA :(
@@ -223,18 +217,13 @@ char* Serial::doRead(int bytes)
 	}
 	//tcflush(fd, TCIOFLUSH);
 
-	printf("Serial::doRead, about to print read data...\n"); // TODO TEMP
-	
- 	const char* retch = buff.c_str();
-	printf("Read from line:\n==============\n%s\n==============\n\n",retch);
 	return (char*)buff.c_str();
 }
 
 bool Serial::doWrite(const char* data, bool priority)
 {
-	printf("Serial::doWrite, Attempt to write:\n\t%s\n", data);
 	//
-	// TODO/NOTE: Timing was removed. Can see old code in diffs.
+	// TODO/NOTE: Timing was removed. If needed, can see old code in diffs. (4/21/09)
 	//
 
 	std::string buff(data);
@@ -257,8 +246,6 @@ bool Serial::doWrite(const char* data, bool priority)
 		len -= written;
 	}
 	clock_gettime(CLOCK_REALTIME, &lastWrite);
-
-	printf("Serial::doWrite, WRITE \"COMMITTED\"! Data: \n\t%s\n", data);
 	return true;
 }
 

@@ -1,6 +1,8 @@
 #include "RobotThread.hpp"
 #include "../internals/MainThreadControl.hpp"
 
+#include <stdio.h>
+
 namespace Controller {
 
 RobotThread::RobotThread(Device::RCSerializer* ser, Internals::RobotState* rs)

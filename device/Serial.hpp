@@ -1,19 +1,9 @@
 #ifndef DEVICE_SERIAL_H
 #define DEVICE_SERIAL_H
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
-#include <termios.h>	// POSIX terminal control
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <pthread.h> // for mutex locks, eg as in fw()
+#include <termios.h>
+#include <pthread.h>
 
-#include <iostream> // TODO: Test
-#include <fstream>
-
-#include <stropts.h> // ioctl
-#include <time.h>
 
 namespace Device {
 /**
