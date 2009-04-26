@@ -36,7 +36,7 @@ class Thread
 		/**
 		 * Stop the thread.
 		 */
-		void stop();
+		virtual void stop();
 
 		/**
 		 * Wait for the thread to finish.

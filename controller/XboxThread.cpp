@@ -64,17 +64,16 @@ void XboxThread::execute(void*)
 		
 		int fullSpeed = 300;
 
-		// TODO: TEMP - ABSOLUTE VALUE FUNCTION. 
-		// Testing with lights instead of motor. (LED uses positive vals only)
-		/*if(ly > 0) {
-			lyp *= -1;
-		}
-		if(ry > 0) {
-			ryp *= -1;
-		}*/
-
 		int lspeed = (int)(lyp*fullSpeed);
 		int rspeed = (int)(ryp*fullSpeed);
+
+
+		if(lspeed > fullSpeed/2 && rspeed == 0) {
+			rspeed = lspeed/2;
+		}
+		else if(rspeed > fullSpeed/2 && lspeed == 0) {
+			lspeed = rspeed/2;
+		}
 
 		printf("XboxThread, LS: %d RS: %d\n", lspeed, rspeed);
 
