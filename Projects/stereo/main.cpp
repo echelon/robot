@@ -42,15 +42,15 @@ int main(int argc, char* argv[])
 		f1 = cam1->queryFrame(); // queryFrameWithHist()
 		f2 = cam2->queryFrame();
 
+		winThread.showImage(f1, 0);
+		winThread.showImage(f2, 1);
+		
 		//win1->showImageWithHist(f1);
 		//win2->showImageWithHist(f2);
 
 		//cvReleaseImage(&f1);
 		//cvReleaseImage(&f2);
 
-		winThread.showImage(f1, 0);
-		winThread.showImage(f2, 1);
-		
 		//if(Vision::Window::keypress())
 		//	break;
 	}
