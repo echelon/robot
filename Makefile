@@ -20,7 +20,6 @@ clean:
 	cd ./etc && $(RM) -f *.o *.out
 	cd ./internals && $(RM) -f *.o *.out
 	cd ./vision && $(RM) -f *.o *.out
-	cd ./stereo && $(RM) -f *.o *.out
 	cd ./Projects && $(RM) -f */*.o */*.out
 
 

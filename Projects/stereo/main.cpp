@@ -16,14 +16,13 @@ int main(int argc, char* argv[])
 	//Vision::Window* win1 = new Vision::Window("win1");
 	//Vision::Window* win2 = new Vision::Window("win2");
 
-	Vision::Camera* cam1 = new Vision::Camera(1);
-	Vision::Camera* cam2 = new Vision::Camera(2);
+	Vision::Camera* cam1 = new Vision::Camera(0); // TODO: Lookup by manufacturer.
+	Vision::Camera* cam2 = new Vision::Camera(1);
 	
 	cam1->setResize(320, 240);
 	cam2->setResize(320, 240);
 
 	Vision::GtkWindowThread winThread(2, "OpenCV Stereoscopic Vision");
-	
 	winThread.start();
 
 
@@ -32,8 +31,6 @@ int main(int argc, char* argv[])
 	Internals::Registry::add("camera", camera);
 
 	camera->setResize(320, 240);*/
-
-
 
 	IplImage* f1;
 	IplImage* f2;
@@ -48,8 +45,8 @@ int main(int argc, char* argv[])
 		//win1->showImageWithHist(f1);
 		//win2->showImageWithHist(f2);
 
-		//cvReleaseImage(&f1);
-		//cvReleaseImage(&f2);
+		cvReleaseImage(&f1);
+		cvReleaseImage(&f2);
 
 		//if(Vision::Window::keypress())
 		//	break;

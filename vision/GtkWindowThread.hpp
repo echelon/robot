@@ -40,8 +40,15 @@ class GtkWindowThread: public Internals::Thread
 		 */
 		void execute(void*);
 
+		/**
+		 * Callback when Gtk session ended.
+		 */
 		static gboolean terminateCallback(GtkWidget* widget, GdkEvent* event, void*);
 
+		/**
+		 * Callback when pixbufs are zero-referenced.
+		 */
+		static void pixbufDestroyCallback(guchar *pixels, gpointer data);
 
 	private:
 		int numImages;
@@ -57,11 +64,14 @@ class GtkWindowThread: public Internals::Thread
 		 * Adapted from internet sources (listed in the cpp file)
 		 */
 		GtkWidget* convertGtk(IplImage* img);
+		GdkPixbuf* convertPixbuf(IplImage* img);
+
 
 		/**
-		 * Messy, temporary space to prevent memleaks in conversion func
+		 * Copy the IplImage's imageData field and return it.
+		 * Memory must be freed by caller.
 		 */
-		IplImage* tempImg;
+		unsigned char* copyImageData(IplImage* img);
 };
 }
 

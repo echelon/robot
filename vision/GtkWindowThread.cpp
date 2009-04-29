@@ -2,6 +2,7 @@
 #include "../internals/MainThreadControl.hpp"
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 namespace Vision {
 
@@ -69,88 +70,117 @@ void GtkWindowThread::showImage(IplImage* img, int panelId)
 		return;
 	}
 
+
 	// TODO: Watch for memleaks
-	GtkWidget* gtkImg = convertGtk(img);
+	GdkPixbuf* pix = convertPixbuf(img);
 
 	gdk_threads_enter();
 	//gtk_container_remove(GTK_CONTAINER(hbox), imageList[panelId]);
-	gtk_widget_destroy(imageList[panelId]);
-	imageList[panelId] = gtkImg;
 
-	gtk_box_pack_start(GTK_BOX(hbox), gtkImg, true, true, 0);
-	gtk_box_reorder_child(GTK_BOX(hbox), gtkImg, panelId);
+	// Delete pixbuf
+	GdkPixbuf* old = gtk_image_get_pixbuf(GTK_IMAGE(imageList[panelId]));
+	gtk_image_clear(GTK_IMAGE(imageList[panelId]));
+
+	gtk_image_set_from_pixbuf(GTK_IMAGE(imageList[panelId]), pix);
+	g_object_unref(G_OBJECT(old)); 
+
+
+	//gtk_widget_destroy(imageList[panelId]);
+	//imageList[panelId] = gtkImg;
+
+	//gtk_box_pack_start(GTK_BOX(hbox), gtkImg, true, true, 0);
+	//gtk_box_reorder_child(GTK_BOX(hbox), gtkImg, panelId);
 
 	gtk_widget_show_all(window);
 	gdk_threads_leave();
 }
 
+GdkPixbuf* GtkWindowThread::convertPixbuf(IplImage* img)
+{
+
+	unsigned char* buffer;
+	GdkPixbuf* pix;
+
+	buffer = copyImageData(img);
+
+	pix = gdk_pixbuf_new_from_data(
+		(guchar*)buffer, // TODO: This is a major source of memleak
+		GDK_COLORSPACE_RGB,
+		FALSE,
+		img->depth,
+		img->width,
+		img->height,
+		img->widthStep,
+		(GdkPixbufDestroyNotify)pixbufDestroyCallback,
+		NULL);
+
+	return pix;
+}
+
+
 // Adapted from:
 // http://camus.arglabs.com/blog/archives/playing-with-opencv-in-gtk/capture-01tar
 GtkWidget* GtkWindowThread::convertGtk(IplImage* img)
 {
-	/* // TODO TEST
-	GdkPixbuf* pb = gdk_pixbuf_new(GDK_COLORSPACE_RGB, true, 8, 8000, 8000);
-	GtkWidget* gi = gtk_image_new_from_pixbuf(pb);
-	return gi;*/
 
-	IplImage* imgCopy;
-	GtkWidget* gtkImg;
+	unsigned char* buffer;
 	GdkPixbuf* pix;
+	GtkWidget* gtkImg;
 
-	if(!tempImg->imageData) {
-		printf("RELEASE\n");
-		//cvReleaseImage(&tempImg); // TODO: Causing segmentation faults. Why?
-		// Must deallocate later to prevent memory leaks
+	buffer = copyImageData(img);
+
+	pix = gdk_pixbuf_new_from_data(
+		(guchar*)buffer, // TODO: This is a major source of memleak
+		GDK_COLORSPACE_RGB,
+		FALSE,
+		img->depth,
+		img->width,
+		img->height,
+		img->widthStep,
+		(GdkPixbufDestroyNotify)pixbufDestroyCallback,
+		NULL);
+
+	gtkImg = gtk_image_new_from_pixbuf(pix);
+	return gtkImg;
+}
+
+unsigned char* GtkWindowThread::copyImageData(IplImage* img)
+{
+	if(!img) {
+		printf("GtkWindowThread::copyImageData, No image supplied.\n");
+		return 0;
 	}
 
-	// Must deallocate later to prevent memory leaks
-	tempImg = cvCreateImage(
+	unsigned char *buffer,*temp1,*temp2;
+	IplImage* imgCopy;
+
+	imgCopy = cvCreateImage(
 		cvSize(img->width,img->height), 
 		img->depth, 
 		img->nChannels);
 
-	//cvCvtColor(img, tempImg, CV_BGR2RGB);
-	cvCvtColor(img, tempImg, CV_BGR2RGB);
+	cvCvtColor(img, imgCopy, CV_BGR2RGB);
 
+	// Solution from:
+	// http://chi3x10.wordpress.com/2008/05/07/be-aware-of-memory...
+	// -alignment-of-iplimage-in-opencv/
+	buffer = 
+		new unsigned char[imgCopy->width*imgCopy->height*imgCopy->nChannels];
+	temp2 = buffer;
 
-	/*guchar* gImageBuffer = 
-		(guchar*) malloc(img->width*img->height*4*sizeof(guchar));
-	guchar *gImagePtr = gImageBuffer;
+	temp1 = (unsigned char*) imgCopy->imageData;
 
-	const guchar* iplImagePtr = (const guchar*)img->imageData;
+	for(int i=0;i<imgCopy->height;i++) {
+		memcpy(temp2, temp1, imgCopy->width*imgCopy->nChannels);
 
-	for (int y = 0; y < img->height; y++) {
-		for (int x = 0; x < img->width; x++) {
-			// We cannot help but copy manually.
-				gImagePtr[0] = iplImagePtr[0];
-				gImagePtr[1] = iplImagePtr[1];
-				gImagePtr[2] = iplImagePtr[2];
-				gImagePtr[3] = 0;
-
-				gImagePtr += 4;
-				iplImagePtr += 3;
-		}
-		iplImagePtr += img->widthStep-3*img->width;
+		// jump to next line
+		temp2 = temp2 + imgCopy->widthStep;
+		temp1 = temp1+ imgCopy->width*imgCopy->nChannels;
 	}
 
-	// free gImageBuffer?*/
+	cvReleaseImage(&imgCopy);
 
-	pix = gdk_pixbuf_new_from_data(
-		(guchar*)tempImg->imageData, // TODO: This is a major source of memleak
-		GDK_COLORSPACE_RGB,
-		FALSE,
-		tempImg->depth,
-		tempImg->width,
-		tempImg->height,
-		tempImg->widthStep,
-		NULL,
-		NULL);
-
-	//free(gImageBuffer);
-
-	gtkImg = gtk_image_new_from_pixbuf(pix);
-
-	return gtkImg;
+	return buffer;
 }
 
 
@@ -158,6 +188,12 @@ gboolean GtkWindowThread::terminateCallback(GtkWidget* widget, GdkEvent* event, 
 {
 	gtk_main_quit();
 	return false;
+}
+
+void GtkWindowThread::pixbufDestroyCallback(guchar* pixels, gpointer data)
+{
+	printf("Free callback\n");
+	delete[] pixels;
 }
 
 
