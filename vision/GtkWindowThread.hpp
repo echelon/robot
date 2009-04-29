@@ -14,6 +14,8 @@ class GtkWindowThread: public Internals::Thread
 {
 	public:
 		GtkWindowThread(int nImages = 1, const char* wTitle = "Untitled Window");
+		GtkWindowThread(int nImages = 1, int nRows = 1, 
+				const char* wTitle = "Untitled Window");
 
 		~GtkWindowThread();
 
@@ -45,33 +47,33 @@ class GtkWindowThread: public Internals::Thread
 		 */
 		static gboolean terminateCallback(GtkWidget* widget, GdkEvent* event, void*);
 
-		/**
-		 * Callback when pixbufs are zero-referenced.
-		 */
-		static void pixbufDestroyCallback(guchar *pixels, gpointer data);
 
 	private:
 		int numImages;
+		int numRows;
 		const char* windowTitle;
 
 		GtkWidget* window;
-		GtkWidget* hbox;
+		GtkWidget* vbox;
 
 		std::vector<GtkWidget*> imageList;
 
 		/**
-		 * Convert OpenCV image to Gtk pixbuf.
+		 * Convert OpenCV IplImage* to Gtk GdkPixbuf*
 		 * Adapted from internet sources (listed in the cpp file)
 		 */
-		GtkWidget* convertGtk(IplImage* img);
 		GdkPixbuf* convertPixbuf(IplImage* img);
-
 
 		/**
 		 * Copy the IplImage's imageData field and return it.
 		 * Memory must be freed by caller.
 		 */
 		unsigned char* copyImageData(IplImage* img);
+
+		/**
+		 * Callback when pixbufs are unreferenced.
+		 */
+		static void pixbufDestroyCallback(guchar *pixels, gpointer data);
 };
 }
 

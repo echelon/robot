@@ -1,17 +1,32 @@
 #include "GtkWindowThread.hpp"
 #include "../internals/MainThreadControl.hpp"
 #include <stdio.h>
-#include <string.h>
-#include <string>
 
 namespace Vision {
 
 GtkWindowThread::GtkWindowThread(int nImages, const char* wTitle):
 	numImages(nImages),
+	numRows(1),
 	windowTitle(wTitle),
 	imageList()
 {
 	// nothing
+}
+
+GtkWindowThread::GtkWindowThread(int nImages, int nRows, const char* wTitle):
+	numImages(nImages),
+	numRows(nRows),
+	windowTitle(wTitle),
+	imageList()
+{
+	if(nRows < 1) {
+		printf("Cannot use less than 1 row\n");
+		// TODO: exception
+	}
+	if(nImages%nRows != 0) {
+		printf("Uneven number of images per row\n");
+		// TODO: possible exception.
+	}
 }
 
 GtkWindowThread::~GtkWindowThread()
@@ -41,15 +56,25 @@ void GtkWindowThread::execute(void*)
 
 	g_signal_connect(window, "destroy", G_CALLBACK(terminateCallback), 0);
 
-	hbox = gtk_hbox_new(true, 0);
+	int numCols = numImages/numRows;
+	printf("Num rows/cols: %d/%d\n", numRows, numCols);
 
-	for(int i = 0; i < numImages; i++) {
-		GtkWidget* child = gtk_image_new_from_file("aas27893dff"); // non-existant file
-		imageList.push_back(child);
-		gtk_box_pack_start(GTK_BOX(hbox), child, true, true, 0);
+	vbox = gtk_vbox_new(true, 0);
+
+	// Create rows, cols
+	int imgCnt = 0;
+	for(int i = 0; i < numRows; i++) {
+		GtkWidget* hhbox = gtk_hbox_new(true, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), hhbox, true, true, 0);
+		for(int j = 0; j < numCols && imgCnt < numImages; j++) {
+			GtkWidget* child = gtk_image_new_from_file("aas27893dff"); // non-existant file
+			imageList.push_back(child);
+			gtk_box_pack_start(GTK_BOX(hhbox), child, true, true, 0);
+			imgCnt++;
+		}
 	}
 
-	gtk_container_add(GTK_CONTAINER(window), hbox);
+	gtk_container_add(GTK_CONTAINER(window), vbox);
 	gtk_widget_show_all(window);
 
 	// Main loop
@@ -60,6 +85,9 @@ void GtkWindowThread::execute(void*)
 
 void GtkWindowThread::showImage(IplImage* img, int panelId) 
 {
+	GdkPixbuf* pix;
+	GdkPixbuf* oldPix;
+
 	if(stopFlag) {
 		return;
 	}
@@ -70,26 +98,19 @@ void GtkWindowThread::showImage(IplImage* img, int panelId)
 		return;
 	}
 
-
-	// TODO: Watch for memleaks
-	GdkPixbuf* pix = convertPixbuf(img);
+	pix = convertPixbuf(img);
 
 	gdk_threads_enter();
-	//gtk_container_remove(GTK_CONTAINER(hbox), imageList[panelId]);
 
-	// Delete pixbuf
-	GdkPixbuf* old = gtk_image_get_pixbuf(GTK_IMAGE(imageList[panelId]));
+	// Delete old pixbuf and replace (TODO: fix error on initial image type)
+	oldPix = gtk_image_get_pixbuf(GTK_IMAGE(imageList[panelId]));
 	gtk_image_clear(GTK_IMAGE(imageList[panelId]));
 
 	gtk_image_set_from_pixbuf(GTK_IMAGE(imageList[panelId]), pix);
-	g_object_unref(G_OBJECT(old)); 
 
-
-	//gtk_widget_destroy(imageList[panelId]);
-	//imageList[panelId] = gtkImg;
-
-	//gtk_box_pack_start(GTK_BOX(hbox), gtkImg, true, true, 0);
-	//gtk_box_reorder_child(GTK_BOX(hbox), gtkImg, panelId);
+	if(oldPix) {
+		g_object_unref(G_OBJECT(oldPix)); // fixes memleak
+	}
 
 	gtk_widget_show_all(window);
 	gdk_threads_leave();
@@ -115,33 +136,6 @@ GdkPixbuf* GtkWindowThread::convertPixbuf(IplImage* img)
 		NULL);
 
 	return pix;
-}
-
-
-// Adapted from:
-// http://camus.arglabs.com/blog/archives/playing-with-opencv-in-gtk/capture-01tar
-GtkWidget* GtkWindowThread::convertGtk(IplImage* img)
-{
-
-	unsigned char* buffer;
-	GdkPixbuf* pix;
-	GtkWidget* gtkImg;
-
-	buffer = copyImageData(img);
-
-	pix = gdk_pixbuf_new_from_data(
-		(guchar*)buffer, // TODO: This is a major source of memleak
-		GDK_COLORSPACE_RGB,
-		FALSE,
-		img->depth,
-		img->width,
-		img->height,
-		img->widthStep,
-		(GdkPixbufDestroyNotify)pixbufDestroyCallback,
-		NULL);
-
-	gtkImg = gtk_image_new_from_pixbuf(pix);
-	return gtkImg;
 }
 
 unsigned char* GtkWindowThread::copyImageData(IplImage* img)
@@ -192,8 +186,7 @@ gboolean GtkWindowThread::terminateCallback(GtkWidget* widget, GdkEvent* event, 
 
 void GtkWindowThread::pixbufDestroyCallback(guchar* pixels, gpointer data)
 {
-	printf("Free callback\n");
-	delete[] pixels;
+	delete[] pixels; // prevent memleak
 }
 
 
