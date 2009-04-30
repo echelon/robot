@@ -31,7 +31,7 @@ class Camera
 
 		/**
 		 * Grab and retrieve the image from the camera.
-		 * Do not release or modify the image.
+		 * Do not release or modify the image that is returned.
 		 * Resized if requested by setResize().
 		 */
 		IplImage* queryFrame();
@@ -69,6 +69,11 @@ class Camera
 		 */
 		int resizeWidth;
 		int resizeHeight;
+
+		/**
+		 * Automatic allocation/deallocation buffer for queryFrame().
+		 */
+		IplImage* queryFrameBuff;
 	
 };
 }

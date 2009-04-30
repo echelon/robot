@@ -43,11 +43,11 @@ Projects/sift/main.o: Projects/sift/main.cpp
 ### STEREO TEST ######################
 stereo: Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/Window.o vision/GtkWindowThread.o
+	vision/Camera.o vision/Window.o vision/GtkWindowThread.o vision/Chessboard.o 
 	@echo "== Linking Stereo =="
 	$(LINK) Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/Window.o vision/GtkWindowThread.o \
+	vision/Camera.o vision/Window.o vision/GtkWindowThread.o vision/Chessboard.o \
 	$(LIBS) -o stereo
 	@echo "========== Stereo compile SUCCESS! =========="
 	@clear
@@ -122,4 +122,6 @@ vision/Window.o: vision/Window.cpp vision/Window.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c Window.cpp
 vision/GtkWindowThread.o: vision/GtkWindowThread.cpp vision/GtkWindowThread.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c GtkWindowThread.cpp
+vision/Chessboard.o: vision/Chessboard.cpp vision/Chessboard.hpp
+	cd ./vision && $(COMPILE) $(INCPATH) -c Chessboard.cpp
 

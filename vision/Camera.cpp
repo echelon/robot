@@ -4,7 +4,10 @@
 
 namespace Vision {
 
-Camera::Camera(int device)
+Camera::Camera(int device):
+	resizeWidth(0),
+	resizeHeight(0),
+	queryFrameBuff(0)
 {
 	capture = cvCreateCameraCapture(device);
 	if (!capture) {
@@ -13,8 +16,6 @@ Camera::Camera(int device)
 
 	width  = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
 	height = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
-	resizeWidth  = 0;
-	resizeHeight = 0;
 }
 
 Camera::~Camera()
@@ -50,18 +51,27 @@ void Camera::setFps(int fps)
 	cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, (double)fps);
 }
 
+/**
+ * Do not deallocate the IplImage* returned. 
+ * The image is not owned by caller.
+ */
 IplImage* Camera::queryFrame()
 {
-	IplImage* frame = cvQueryFrame(capture);
+	IplImage* frame;
 
-	// Resize if setResize()
+	frame = cvQueryFrame(capture); // capture device deallocates on call!!
+
+	// if setResize()
 	if(resizeWidth && resizeHeight) {
-		IplImage* resized = 
-			cvCreateImage(cvSize(resizeWidth, resizeHeight), IPL_DEPTH_8U, 3);
-		cvResize(frame, resized);
+		if(queryFrameBuff != 0) {
+			cvReleaseImage(&queryFrameBuff);
+		}
 
-		//cvReleaseImage(&frame); // TODO: Deallocation error
-		return resized;
+		queryFrameBuff = 
+			cvCreateImage(cvSize(resizeWidth, resizeHeight), IPL_DEPTH_8U, 3);
+		cvResize(frame, queryFrameBuff);
+
+		return queryFrameBuff;
 	}
 	return frame;
 }
