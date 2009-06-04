@@ -1,19 +1,20 @@
-#ifndef VISION_CHESSBOARD_H
-#define VISION_CHESSBOARD_H
+#ifndef VISION_CAMERA_CALIBRATION_H
+#define VISION_CAMERA_CALIBRATION_H
 
 #include <cv.h>
 
 namespace Vision {
+namespace Camera {
 
 /**
  * For camera calibration purposes. Find and store the corners of a chessboard
  * with OpenCV's chessboard calibration algorithms.
  */
-class Chessboard
+class Calibration
 {
 	public:
-		Chessboard(CvSize size = cvSize(7,7), int numStore = 5);
-		~Chessboard();
+		Calibration(CvSize size = cvSize(7,7), int numStore = 5);
+		~Calibration();
 
 		/**
 		 * Find the chessboard corners.
@@ -73,6 +74,7 @@ class Chessboard
 		IplImage* mapy;
 
 };
+}
 }
 
 #endif

@@ -13,7 +13,7 @@ all:
 
 .PHONY: clean
 clean:
-	$(RM) -f *.o *.a *.out laser motor stereo sift test
+	$(RM) -f *.o *.a *.out laserApp motorApp stereoApp siftApp testApp
 	cd ./ai && $(RM) -f *.o *.out
 	cd ./controller && $(RM) -f *.o *.out
 	cd ./device && $(RM) -f *.o *.out
@@ -26,14 +26,14 @@ clean:
 ### TEST ###########################
 test: test.cpp
 	$(COMPILE) $(INCPATH) -c test.cpp
-	$(LINK) test.o $(LIBS) -o test
+	$(LINK) test.o $(LIBS) -o testApp
 
 
 ### SIFT TEST ######################
-sift: Projects/sift/main.o internals/Registry.o vision/Camera.o vision/Window.o
+sift: Projects/sift/main.o internals/Registry.o vision/Camera.o vision/HighGuiWindow.o
 	@echo "== Linking Laser =="
 	$(LINK) Projects/sift/main.o internals/Registry.o vision/Camera.o \
-	vision/Window.o $(LIBS) -o sift
+	vision/HighGuiWindow.o $(LIBS) -o sift
 	@echo "========== Laser compile SUCCESS! =========="
 	
 Projects/sift/main.o: Projects/sift/main.cpp
@@ -43,12 +43,14 @@ Projects/sift/main.o: Projects/sift/main.cpp
 ### STEREO TEST ######################
 stereo: Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/Window.o vision/GtkWindowThread.o vision/Chessboard.o 
+	vision/Camera.o vision/GtkWindowThread.o \
+	vision/Camera/Calibration.o vision/Camera/CalibrationThread.o
 	@echo "== Linking Stereo =="
 	$(LINK) Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/Window.o vision/GtkWindowThread.o vision/Chessboard.o \
-	$(LIBS) -o stereo
+	vision/Camera.o vision/GtkWindowThread.o \
+	vision/Camera/Calibration.o vision/Camera/CalibrationThread.o \
+	$(LIBS) -o stereoApp
 	@echo "========== Stereo compile SUCCESS! =========="
 	@clear
 	@echo "Stereo project compiled successfully."
@@ -58,10 +60,10 @@ Projects/stereo/main.o: Projects/stereo/main.cpp
 	cd ./Projects/stereo && $(COMPILE) $(INCPATH) -c main.cpp
 
 ### LASER TEST #####################
-laser: Projects/laser/main.o internals/Registry.o vision/Camera.o vision/Window.o
+laser: Projects/laser/main.o internals/Registry.o vision/Camera.o vision/HighGuiWindow.o
 	@echo "== Linking Laser =="
 	$(LINK) Projects/laser/main.o internals/Registry.o vision/Camera.o \
-	vision/Window.o $(LIBS) -o laser
+	vision/HighGuiWindow.o $(LIBS) -o laserApp
 	@echo "========== Laser compile SUCCESS! =========="
 	
 Projects/laser/main.o: Projects/laser/main.cpp
@@ -78,7 +80,7 @@ motor: Projects/motor/main.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
 	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/RobotThread.o \
-	$(LIBS) -o motor
+	$(LIBS) -o motorApp
 	@echo "========== Motor compile SUCCESS! =========="
 	@clear
 	@echo "Motor project compiled successfully."
@@ -118,10 +120,12 @@ internals/RobotState.o: internals/RobotState.cpp internals/RobotState.hpp
 ### VISION LIBS ####################
 vision/Camera.o: vision/Camera.cpp vision/Camera.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c Camera.cpp
-vision/Window.o: vision/Window.cpp vision/Window.hpp
-	cd ./vision && $(COMPILE) $(INCPATH) -c Window.cpp
+vision/HighGuiWindow.o: vision/HighGuiWindow.cpp vision/HighGuiWindow.hpp
+	cd ./vision && $(COMPILE) $(INCPATH) -c HighGuiWindow.cpp
 vision/GtkWindowThread.o: vision/GtkWindowThread.cpp vision/GtkWindowThread.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c GtkWindowThread.cpp
-vision/Chessboard.o: vision/Chessboard.cpp vision/Chessboard.hpp
-	cd ./vision && $(COMPILE) $(INCPATH) -c Chessboard.cpp
+vision/Camera/Calibration.o: 
+	cd ./vision/Camera && $(COMPILE) $(INCPATH) -c Calibration.cpp
+vision/Camera/CalibrationThread.o: 
+	cd ./vision/Camera && $(COMPILE) $(INCPATH) -c CalibrationThread.cpp
 

@@ -1,25 +1,25 @@
-#include "Window.hpp"
+#include "HighGuiWindow.hpp"
 #include <stdio.h>
 
 namespace Vision {
 
-Window::Window(const char* name) : 
+HighGuiWindow::HighGuiWindow(const char* name) : 
 	windowName(name)
 {
 	cvNamedWindow(windowName, 1);
 }
 
-Window::~Window()
+HighGuiWindow::~HighGuiWindow()
 {
 	cvDestroyWindow(windowName);
 }
 
-void Window::showImage(IplImage* image)
+void HighGuiWindow::showImage(IplImage* image)
 {
 	cvShowImage(windowName, image);
 }
 
-void Window::showImageWithHist(IplImage* image)
+void HighGuiWindow::showImageWithHist(IplImage* image)
 {
 	IplImage* gray;
 
@@ -76,19 +76,19 @@ void Window::showImageWithHist(IplImage* image)
 	cvShowImage(windowName, image);
 }
 
-void Window::createTrackbar(const char* name, 
+void HighGuiWindow::createTrackbar(const char* name, 
 		int maxVal, int defVal, CvTrackbarCallback callback)
 {
 	trackbarValues.push_back(defVal);
 	cvCreateTrackbar(name, windowName, &trackbarValues.back(), maxVal, callback);
 }
 
-int Window::getTrackbarValue(const char* name)
+int HighGuiWindow::getTrackbarValue(const char* name)
 {
 	return cvGetTrackbarPos(name, windowName);
 }
 
-bool Window::keypress()
+bool HighGuiWindow::keypress()
 {
 	return ((cvWaitKey(10) & 255) == 27);
 }

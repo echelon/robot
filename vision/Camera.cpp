@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include "Canvas.hpp"
+#include "./Camera/Calibration.hpp"
 #include <stdio.h>
 
 namespace Vision {
@@ -64,6 +65,7 @@ IplImage* Camera::queryFrame()
 	// if setResize()
 	if(resizeWidth && resizeHeight) {
 		if(queryFrameBuff != 0) {
+			// cannot deallocate frame from cvQueryFrame()!
 			cvReleaseImage(&queryFrameBuff);
 		}
 

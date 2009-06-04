@@ -11,24 +11,24 @@ namespace Vision
 /**
  * This class encapsulates OpenCV's High GUI.
  */
-class Window 
+class HighGuiWindow 
 {
 	public:
 		/**
 		 * Default constructor.
 		 * Does nothing. 
 		 */
-		Window() {}
+		HighGuiWindow() {}
 
 		/**
 		 * Constructor.
 		 */
-		Window(const char* name);
+		HighGuiWindow(const char* name);
 
 		/**
 		 * Destructor.  
 		 */
-		~Window();
+		~HighGuiWindow();
 
 		/**
 		 * Show an image in the window.

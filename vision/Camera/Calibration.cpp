@@ -1,12 +1,13 @@
-#include "Chessboard.hpp"
+#include "Calibration.hpp"
 #include <stdio.h>
 
 namespace Vision {
+namespace Camera {
 
 // TODO: Rename member vars
 // This code based on O'Reilly's text on OpenCV
 
-Chessboard::Chessboard(CvSize size, int numStore) :
+Calibration::Calibration(CvSize size, int numStore) :
 	boardSize(size),
 	gray(0),
 	numToStore(numStore),
@@ -25,7 +26,7 @@ Chessboard::Chessboard(CvSize size, int numStore) :
 	distortCoeff = cvCreateMat(5, 1, CV_32FC1);
 }
 
-Chessboard::~Chessboard()
+Calibration::~Calibration()
 {
 	delete[] corners;
 
@@ -34,7 +35,7 @@ Chessboard::~Chessboard()
 	}
 }
 
-int Chessboard::findCorners(IplImage* img, bool getSubpix)
+int Calibration::findCorners(IplImage* img, bool getSubpix)
 {
 	found = cvFindChessboardCorners(img, boardSize, corners, &cornerCnt);
 
@@ -60,19 +61,19 @@ int Chessboard::findCorners(IplImage* img, bool getSubpix)
 	return found;
 }
 
-int Chessboard::findAndDrawCorners(IplImage* img, bool getSubpix)
+int Calibration::findAndDrawCorners(IplImage* img, bool getSubpix)
 {
 	found = findCorners(img, getSubpix);
 	cvDrawChessboardCorners(img, boardSize, corners, cornerCnt, found);
 	return found;
 }
 
-void Chessboard::drawCorners(IplImage* img)
+void Calibration::drawCorners(IplImage* img)
 {
 	cvDrawChessboardCorners(img, boardSize, corners, cornerCnt, found);
 }
 
-void Chessboard::storeCorners()
+void Calibration::storeCorners()
 {
 	if(numStored >= numToStore) {
 		return;
@@ -93,12 +94,12 @@ void Chessboard::storeCorners()
 	numStored++;
 }
 
-bool Chessboard::foundEnough()
+bool Calibration::foundEnough()
 {
 	return (numStored == numToStore);
 }
 
-void Chessboard::calibrateCamPrep(IplImage* img)
+void Calibration::calibrateCamPrep(IplImage* img)
 {
 	printf("\nNumStored: %d\nBoardArea: %d\n\n", numStored, boardArea);
 
@@ -151,7 +152,7 @@ void Chessboard::calibrateCamPrep(IplImage* img)
 	);
 }
 
-IplImage* Chessboard::calibrateFrame(IplImage* img)
+IplImage* Calibration::calibrateFrame(IplImage* img)
 {
 	IplImage* uimg = cvCloneImage(img);
 	cvRemap(uimg, img, mapx, mapy);
@@ -159,4 +160,5 @@ IplImage* Chessboard::calibrateFrame(IplImage* img)
 	return uimg;
 }
 
-} // end namespace
+} // end namespace Camera
+} // end namespace Vision
