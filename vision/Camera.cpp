@@ -1,6 +1,5 @@
 #include "Camera.hpp"
 #include "Canvas.hpp"
-#include "./Camera/Calibration.hpp"
 #include <stdio.h>
 
 namespace Vision {
@@ -17,11 +16,14 @@ Camera::Camera(int device):
 
 	width  = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
 	height = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
+
+	calibration = new Device::Calibration(*this);
 }
 
 Camera::~Camera()
 {
 	cvReleaseCapture(&capture);
+	delete calibration;
 }
 
 void Camera::setDimensions(int w, int h)
@@ -73,8 +75,30 @@ IplImage* Camera::queryFrame()
 			cvCreateImage(cvSize(resizeWidth, resizeHeight), IPL_DEPTH_8U, 3);
 		cvResize(frame, queryFrameBuff);
 
-		return queryFrameBuff;
+		if(!calibration->isCalibrated()) {
+			return queryFrameBuff;
+		}
 	}
+
+	// if calibrated
+	if(calibration->isCalibrated()) {
+		if(calibratedBuff != 0) {
+			cvReleaseImage(&calibratedBuff);
+		}
+
+		if(resizeWidth && resizeHeight) {
+			calibratedBuff = cvCloneImage(queryFrameBuff);
+			cvRemap(calibratedBuff, queryFrameBuff, 
+				calibration->getXMap(), calibration->getYMap());
+		}
+		else {
+			calibratedBuff = cvCloneImage(frame);
+			cvRemap(calibratedBuff, frame, 
+				calibration->getXMap(), calibration->getYMap());
+		}
+		return calibratedBuff;
+	}
+
 	return frame;
 }
 
@@ -128,20 +152,33 @@ IplImage* Camera::queryFrameWithHist()
 
 int Camera::getWidth() 
 {
-	int w = width;
-	if(resizeWidth) {
-		w = resizeWidth;
+	if(!resizeWidth) {
+		return width;
 	}
-	return w;
+	return resizeWidth;
 }
 
 int Camera::getHeight()
 {
-	int h = height;
-	if(resizeHeight) {
-		h = resizeHeight;
+	if(!resizeHeight) {
+		return height;
 	}
-	return h;
+	return resizeHeight;
+}
+
+Device::Calibration* Camera::getCalibration()
+{
+	return calibration;
+}
+
+bool Camera::saveConfig(const char* filename)
+{
+	return calibration->save(filename);
+}
+
+bool Camera::loadConfig(const char* filename)
+{
+	return calibration->load(filename);
 }
 
 } // end namespace

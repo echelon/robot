@@ -3,16 +3,11 @@
 
 #include <cv.h>
 #include <highgui.h>
+#include "Device/Calibration.hpp" // included here for the sake of API
 
 // TODO: If calibration is made threaded, ensure no race conditions occur.
 
 namespace Vision {
-
-// forward decs
-namespace Camera { 
-	class Calibration;
-}
-
 class Camera 
 {
 	public:
@@ -58,7 +53,7 @@ class Camera
 		 * Grabs from queryFrame() but adds chessboard
 		 * corners to the image (from the last performed search).
 		 */
-		IplImage* queryFrameWithChess();
+		IplImage* queryFrameWithChessboard();
 		
 		/**
 		 * Return the original width of the frame, or the resized width.
@@ -71,10 +66,21 @@ class Camera
 		int getHeight();
 
 		/**
-		 * Determine if calibration has finished (or was performed at all).
+		 * Get the calibration object.
+		 * If none exists, it will be created here.
 		 */
-		bool isCalibrated();
-		
+		Device::Calibration* getCalibration();
+
+		/**
+		 * Save the configuration.
+		 */
+		bool saveConfig(const char* filename);
+
+		/**
+		 * Load a configuration file.
+		 */
+		bool loadConfig(const char* filename);
+
 	private:
 		/**
 		 * Capture structure.
@@ -99,9 +105,19 @@ class Camera
 		IplImage* queryFrameBuff;
 
 		/**
+		 * Allocation/deallocation buffer for calibrated images.
+		 */
+		IplImage* calibratedBuff;
+
+		/**
 		 * Calibration tool for this device.
 		 */
-		Camera::Calibration* calibration;
+		Device::Calibration* calibration;
+
+		/**
+		 * Initialize the calibration object if not yet created.
+		 */
+		void initCalibration();
 };
 }
 

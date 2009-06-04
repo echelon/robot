@@ -3,8 +3,13 @@
 
 #include <cv.h>
 
+// forward declarations
 namespace Vision {
-namespace Camera {
+	class Camera;
+}
+
+namespace Vision {
+namespace Device {
 
 /**
  * For camera calibration purposes. Find and store the corners of a chessboard
@@ -13,8 +18,32 @@ namespace Camera {
 class Calibration
 {
 	public:
-		Calibration(CvSize size = cvSize(7,7), int numStore = 5);
+		Calibration(Camera& cam, CvSize size = cvSize(7,7), int numStore = 5);
 		~Calibration();
+
+		/**
+		 * Determine if calibration has finished (or was performed at all).
+		 */
+		bool isCalibrated(); // TODO: Don't know about the semantics of this
+
+		/**
+		 * Calibrate the camera. Launches as a new thread, so control the
+		 * calling code with calls to isCalibrated().
+		 * TODO: More advanced thread signalling. 
+		 */
+		void calibrateThreaded();
+
+		/**
+		 * Save calibration data to XML.
+		 */
+		bool save(const char* filename);
+
+		/**
+		 * Load a precalibrated configurations from XML.
+		 */
+		bool load(const char* filename);
+
+
 
 		/**
 		 * Find the chessboard corners.
@@ -36,11 +65,41 @@ class Calibration
 
 		bool foundEnough();
 
-		void calibrateCamPrep(IplImage* img);
+		/**
+		 * Calculate the needed parameters from the data collected.
+		 */
+		void finalize(IplImage* img);
 
 		IplImage* calibrateFrame(IplImage* img);
 
+		/**
+		 * Access to skip count, the number of frames to skip between captures.
+		 */
+		unsigned int getSkipCount();
+		void setSkipCount(unsigned int s);
+
+		/**
+		 * Map accessors.
+		 */
+		IplImage* getXMap();
+		IplImage* getYMap();
+
+		/**
+		 * Return camera reference.
+		 */
+		Camera& getCamera();
+
 	private:
+		// TODO NEW VARS
+		bool calibrationStarted;
+		bool calibrationFinished;
+		bool calibrationLoaded;
+		unsigned int skipCount;
+
+		// Reference to camera
+		Camera& camera;
+
+
 		// TODO: Rename member vars to be more specific...
 		int cornerCnt;
 		int found;

@@ -6,10 +6,9 @@
 
 #include "../../vision/Canvas.hpp"
 #include "../../vision/Camera.hpp"
-#include "../../vision/Window.hpp"
 #include "../../vision/GtkWindowThread.hpp"
 #include "../../internals/MainThreadControl.hpp"
-#include "../../vision/Chessboard.hpp"
+//#include "../../vision/Chessboard.hpp"
 
 
 int main(int argc, char* argv[])
@@ -26,7 +25,15 @@ int main(int argc, char* argv[])
 	IplImage* f1;
 	IplImage* f2;
 
-	Vision::Chessboard board1(cvSize(7,6), 10);
+	printf("Test1\n");
+	cam1->getCalibration();
+	printf("Test2\n");
+	//cam1->getCalibration()->calibrateThreaded();
+	printf("Test3\n");
+	//cam1->getCalibration().calibrateThreaded();
+
+
+	/*Vision::Chessboard board1(cvSize(7,6), 10);
 	Vision::Chessboard board2(cvSize(7,6));
 
 	int skipFrames = 3;
@@ -49,19 +56,20 @@ int main(int argc, char* argv[])
 
 
 	board1.calibrateCamPrep(f1);
-	printf("Calibration done for cam 1\n");
+	printf("Calibration done for cam 1\n");*/
 
 	while(!Internals::MainThreadControl::wasSignaled()) {
 		f1 = cam1->queryFrameWithHist(); // queryFrameWithHist()
 		f2 = cam2->queryFrame();
 
-		IplImage* f1cal = board1.calibrateFrame(f1);
+		//IplImage* f1cal = board1.calibrateFrame(f1);
 
 		//board1.findAndDrawCorners(f1);
 		//board2.findAndDrawCorners(f2);
 
 		winThread.showImage(f1, 0);
-		winThread.showImage(f1cal, 1);
+		//winThread.showImage(f1cal, 1);
+		winThread.showImage(f2, 1);
 		
 		//win1->showImageWithHist(f1);
 		//win2->showImageWithHist(f2);

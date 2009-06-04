@@ -1,17 +1,25 @@
 #include "Calibration.hpp"
+#include "CalibrationThread.hpp"
 #include <stdio.h>
 
 namespace Vision {
-namespace Camera {
+namespace Device {
 
 // TODO: Rename member vars
 // This code based on O'Reilly's text on OpenCV
 
-Calibration::Calibration(CvSize size, int numStore) :
+Calibration::Calibration(Camera& cam, CvSize size, int numStore) :
 	boardSize(size),
 	gray(0),
 	numToStore(numStore),
-	numStored(0)
+	numStored(0),
+	calibrationStarted(false),
+	calibrationFinished(false),
+	calibrationLoaded(false),
+	skipCount(3), // TODO: TEMP
+	camera(cam),
+	mapx(0),
+	mapy(0)
 {
 	boardArea = size.width*size.height;
 	corners = new CvPoint2D32f[boardArea];
@@ -56,6 +64,7 @@ int Calibration::findCorners(IplImage* img, bool getSubpix)
 
 	if(cornerCnt == boardArea) {
 		storeCorners();
+		printf("Corners found!\n");
 	}
 
 	return found;
@@ -99,7 +108,7 @@ bool Calibration::foundEnough()
 	return (numStored == numToStore);
 }
 
-void Calibration::calibrateCamPrep(IplImage* img)
+void Calibration::finalize(IplImage* img)
 {
 	printf("\nNumStored: %d\nBoardArea: %d\n\n", numStored, boardArea);
 
@@ -150,6 +159,8 @@ void Calibration::calibrateCamPrep(IplImage* img)
 		distortCoeff,
 		mapx, mapy
 	);
+
+	calibrationFinished = true;
 }
 
 IplImage* Calibration::calibrateFrame(IplImage* img)
@@ -159,6 +170,62 @@ IplImage* Calibration::calibrateFrame(IplImage* img)
 
 	return uimg;
 }
+
+unsigned int Calibration::getSkipCount()
+{
+	return skipCount;
+}
+
+void Calibration::setSkipCount(unsigned int s)
+{
+	skipCount = s;
+}
+
+bool Calibration::load(const char* filename)
+{
+	return false; // TODO: Implement
+}
+
+bool Calibration::save(const char* filename)
+{
+	return false; // TODO: Implement
+}
+
+bool Calibration::isCalibrated()
+{
+	return (calibrationStarted && calibrationFinished) || calibrationLoaded;
+}
+
+Camera& Calibration::getCamera()
+{
+	return camera;
+}
+
+
+void Calibration::calibrateThreaded()
+{
+	printf("Testing...");
+	if(calibrationStarted) {
+		return;
+	}
+	printf("Testing...2");
+	calibrationStarted = true;
+
+	//CalibrationThread cal(*this);
+	//cal.start();
+}
+
+IplImage* Calibration::getXMap()
+{
+	return mapx;
+}
+
+IplImage* Calibration::getYMap()
+{
+	return mapy;
+}
+
+
 
 } // end namespace Camera
 } // end namespace Vision

@@ -20,6 +20,7 @@ clean:
 	cd ./etc && $(RM) -f *.o *.out
 	cd ./internals && $(RM) -f *.o *.out
 	cd ./vision && $(RM) -f *.o *.out
+	cd ./vision/Device && $(RM) -f *.o *.out
 	cd ./Projects && $(RM) -f */*.o */*.out
 
 
@@ -43,13 +44,13 @@ Projects/sift/main.o: Projects/sift/main.cpp
 ### STEREO TEST ######################
 stereo: Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/GtkWindowThread.o \
-	vision/Camera/Calibration.o vision/Camera/CalibrationThread.o
+	vision/GtkWindowThread.o \
+	vision/Device/Calibration.o vision/Device/CalibrationThread.o vision/Camera.o
 	@echo "== Linking Stereo =="
 	$(LINK) Projects/stereo/main.o \
 	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/Camera.o vision/GtkWindowThread.o \
-	vision/Camera/Calibration.o vision/Camera/CalibrationThread.o \
+	vision/GtkWindowThread.o \
+	vision/Device/Calibration.o vision/Device/CalibrationThread.o vision/Camera.o \
 	$(LIBS) -o stereoApp
 	@echo "========== Stereo compile SUCCESS! =========="
 	@clear
@@ -124,8 +125,8 @@ vision/HighGuiWindow.o: vision/HighGuiWindow.cpp vision/HighGuiWindow.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c HighGuiWindow.cpp
 vision/GtkWindowThread.o: vision/GtkWindowThread.cpp vision/GtkWindowThread.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c GtkWindowThread.cpp
-vision/Camera/Calibration.o: 
-	cd ./vision/Camera && $(COMPILE) $(INCPATH) -c Calibration.cpp
-vision/Camera/CalibrationThread.o: 
-	cd ./vision/Camera && $(COMPILE) $(INCPATH) -c CalibrationThread.cpp
+vision/Device/Calibration.o: 
+	cd ./vision/Device && $(COMPILE) $(INCPATH) -c Calibration.cpp
+vision/Device/CalibrationThread.o: 
+	cd ./vision/Device && $(COMPILE) $(INCPATH) -c CalibrationThread.cpp
 
