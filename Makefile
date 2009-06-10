@@ -125,8 +125,8 @@ vision/HighGuiWindow.o: vision/HighGuiWindow.cpp vision/HighGuiWindow.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c HighGuiWindow.cpp
 vision/GtkWindowThread.o: vision/GtkWindowThread.cpp vision/GtkWindowThread.hpp
 	cd ./vision && $(COMPILE) $(INCPATH) -c GtkWindowThread.cpp
-vision/Device/Calibration.o: 
+vision/Device/Calibration.o: vision/Device/Calibration.cpp vision/Device/Calibration.hpp
 	cd ./vision/Device && $(COMPILE) $(INCPATH) -c Calibration.cpp
-vision/Device/CalibrationThread.o: 
+vision/Device/CalibrationThread.o: vision/Device/CalibrationThread.cpp vision/Device/CalibrationThread.hpp
 	cd ./vision/Device && $(COMPILE) $(INCPATH) -c CalibrationThread.cpp
 

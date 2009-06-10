@@ -1,5 +1,6 @@
 #include "Calibration.hpp"
 #include "CalibrationThread.hpp"
+#include "../GtkWindowThread.hpp"
 #include <stdio.h>
 
 namespace Vision {
@@ -8,18 +9,21 @@ namespace Device {
 // TODO: Rename member vars
 // This code based on O'Reilly's text on OpenCV
 
-Calibration::Calibration(Camera& cam, CvSize size, int numStore) :
+Calibration::Calibration(Camera* cam, CvSize size, int numStore) :
 	boardSize(size),
 	gray(0),
-	numToStore(numStore),
-	numStored(0),
 	calibrationStarted(false),
 	calibrationFinished(false),
 	calibrationLoaded(false),
 	skipCount(3), // TODO: TEMP
 	camera(cam),
+	numToStore(numStore),
+	numStored(0),
 	mapx(0),
-	mapy(0)
+	mapy(0),
+	calibrationThread(0)//,
+	//windowThread(0),
+	//windowNumber(0)
 {
 	boardArea = size.width*size.height;
 	corners = new CvPoint2D32f[boardArea];
@@ -105,7 +109,10 @@ void Calibration::storeCorners()
 
 bool Calibration::foundEnough()
 {
-	return (numStored == numToStore);
+	if (numStored == numToStore) {
+		return true;
+	}
+	return false;
 }
 
 void Calibration::finalize(IplImage* img)
@@ -196,23 +203,27 @@ bool Calibration::isCalibrated()
 	return (calibrationStarted && calibrationFinished) || calibrationLoaded;
 }
 
-Camera& Calibration::getCamera()
+bool Calibration::isStarted()
 {
-	return camera;
+	return calibrationStarted || calibrationFinished || calibrationLoaded;
 }
 
+Camera& Calibration::getCamera()
+{
+	return *camera;
+}
 
 void Calibration::calibrateThreaded()
 {
-	printf("Testing...");
 	if(calibrationStarted) {
 		return;
 	}
-	printf("Testing...2");
 	calibrationStarted = true;
 
-	//CalibrationThread cal(*this);
-	//cal.start();
+	printf("Begin calibration...\n");
+	calibrationThread = new CalibrationThread(*this);
+	//calibrationThread->setWindow(windowThread, windowNumber);
+	calibrationThread->start();
 }
 
 IplImage* Calibration::getXMap()
@@ -225,6 +236,16 @@ IplImage* Calibration::getYMap()
 	return mapy;
 }
 
+void Calibration::setWindow(GtkWindowThread* winThread, int winNumber)
+{
+	//windowThread = winThread;
+	//windowNumber = winNumber;
+
+	if(calibrationThread) {
+		printf("Passing to CalibrationThread...\n");
+		calibrationThread->setWindow(winThread, winNumber);
+	}
+}
 
 
 } // end namespace Camera

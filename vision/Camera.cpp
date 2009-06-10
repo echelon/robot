@@ -1,13 +1,16 @@
 #include "Camera.hpp"
 #include "Canvas.hpp"
 #include <stdio.h>
+#include <stdexcept>
 
 namespace Vision {
 
 Camera::Camera(int device):
 	resizeWidth(0),
 	resizeHeight(0),
-	queryFrameBuff(0)
+	queryFrameBuff(0),
+	calibratedBuff(0),
+	deviceNum(device)
 {
 	capture = cvCreateCameraCapture(device);
 	if (!capture) {
@@ -17,7 +20,8 @@ Camera::Camera(int device):
 	width  = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
 	height = cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
 
-	calibration = new Device::Calibration(*this);
+	calibration = new Device::Calibration(this, cvSize(7,7), 12);
+	calibration->setSkipCount(4);
 }
 
 Camera::~Camera()
@@ -58,11 +62,15 @@ void Camera::setFps(int fps)
  * Do not deallocate the IplImage* returned. 
  * The image is not owned by caller.
  */
-IplImage* Camera::queryFrame()
+IplImage* Camera::queryFrame(bool returnCalibrated)
 {
 	IplImage* frame;
 
 	frame = cvQueryFrame(capture); // capture device deallocates on call!!
+
+	/*while(frame == 0) {
+		frame = cvQueryFrame(capture);
+	}*/
 
 	// if setResize()
 	if(resizeWidth && resizeHeight) {
@@ -75,13 +83,13 @@ IplImage* Camera::queryFrame()
 			cvCreateImage(cvSize(resizeWidth, resizeHeight), IPL_DEPTH_8U, 3);
 		cvResize(frame, queryFrameBuff);
 
-		if(!calibration->isCalibrated()) {
+		if(!calibration->isCalibrated() || !returnCalibrated) {
 			return queryFrameBuff;
 		}
 	}
 
 	// if calibrated
-	if(calibration->isCalibrated()) {
+	if(calibration->isCalibrated() && returnCalibrated) {
 		if(calibratedBuff != 0) {
 			cvReleaseImage(&calibratedBuff);
 		}
@@ -98,13 +106,12 @@ IplImage* Camera::queryFrame()
 		}
 		return calibratedBuff;
 	}
-
 	return frame;
 }
 
-IplImage* Camera::queryFrameWithHist()
+IplImage* Camera::queryFrameWithHist(bool returnCalibrated)
 {
-	IplImage* frame = queryFrame();
+	IplImage* frame = queryFrame(returnCalibrated);
 	IplImage* gray = cvCreateImage(cvGetSize(frame), 8, 1);
 
 	cvCvtColor(frame, gray, CV_RGB2GRAY);
@@ -136,12 +143,6 @@ IplImage* Camera::queryFrameWithHist()
 			cvPoint((getWidth()-256)+i, getHeight()-normalized), 
 			CV_RGB(255, 255, 255)
 		);
-		/*cvLine(
-			frame, 
-			cvPoint((getWidth()-256)+i, getHeight()-normalized), 
-			cvPoint((getWidth()-256)+i, getHeight()-boxHeight), 
-			CV_RGB(0, 0, 0)
-		);*/
 	}
 
 	cvReleaseImage(&gray);
@@ -168,6 +169,11 @@ int Camera::getHeight()
 
 Device::Calibration* Camera::getCalibration()
 {
+	if(calibration == 0) {
+		printf("No calibration exists!\n");
+		return 0;
+	}
+	printf("Got calibration...\n");
 	return calibration;
 }
 

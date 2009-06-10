@@ -98,6 +98,10 @@ void GtkWindowThread::showImage(IplImage* img, int panelId)
 		return;
 	}
 
+	if(!img) {
+		return;
+	}
+
 	pix = convertPixbuf(img);
 
 	gdk_threads_enter();

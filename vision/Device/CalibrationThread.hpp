@@ -4,11 +4,12 @@
 #include "../../internals/Thread.hpp"
 #include <cv.h>
 
+// forward decs
+namespace Vision { class GtkWindowThread; }
+namespace Vision { namespace Device { class Calibration; } }
+
 namespace Vision {
 namespace Device {
-
-// forward decs
-class Calibration;
 
 /**
  * GtkWindowThread is a thread that controls output through Gtk.
@@ -19,13 +20,17 @@ class CalibrationThread: public Internals::Thread
 		CalibrationThread(Calibration& cal);
 		~CalibrationThread();
 
+		/**
+		 * Set the gui options.
+		 */		
+		void setWindow(GtkWindowThread* winThread, int winNumber);
 
 	protected:
 		/**
 		 * Setup the thread.
 		 * Virtual override, called automatically.
 		 */
-		void setup();
+		//void setup();
 
 		/**
 		 * "Destroy" the thread.
@@ -40,6 +45,13 @@ class CalibrationThread: public Internals::Thread
 
 	private:
 		Calibration& calibration;
+
+		/**
+		 * Gui Presentation
+		 */
+		Vision::GtkWindowThread* windowThread;
+		int windowNumber;
+		
 
 };
 }

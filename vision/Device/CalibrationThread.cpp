@@ -1,13 +1,16 @@
 #include "CalibrationThread.hpp"
 #include "Calibration.hpp"
 #include "../Camera.hpp"
+#include "../GtkWindowThread.hpp"
 #include <stdio.h>
 
 namespace Vision {
 namespace Device {
 
 CalibrationThread::CalibrationThread(Calibration& cal):
-	calibration(cal)
+	calibration(cal),
+	windowThread(0),
+	windowNumber(0)
 {
 	// nothing
 }
@@ -17,10 +20,10 @@ CalibrationThread::~CalibrationThread()
 	// nothing
 }
 
-void CalibrationThread::setup()
+/*void CalibrationThread::setup()
 {
 	// nothing
-}
+}*/
 
 void CalibrationThread::destroy()
 {
@@ -29,23 +32,38 @@ void CalibrationThread::destroy()
 
 void CalibrationThread::execute(void*)
 {
-	/*IplImage* frame;
+	IplImage* frame;
+	Camera& cam = calibration.getCamera();
 	int frameCnt = 0;
 
-	printf("Beginning calibration\n");
+	int skipCount = calibration.getSkipCount();
+	if(skipCount < 1) {
+		skipCount = 1;
+	}
 
 	while(!calibration.foundEnough()) {
-		frame = calibration.getCamera().queryFrame();
+		frame = cam.queryFrame();
+
 		frameCnt = (frameCnt+1)%1000;
-		if(frameCnt % calibration.getSkipCount() == 0) {
-			calibration.findCorners(frame); // TODO: findCorners() only.
+		if(frameCnt % skipCount == 0) {
+			calibration.findAndDrawCorners(frame); // TODO: findCorners() only.
+		}
+
+		if(windowThread) {
+			windowThread->showImage(frame, windowNumber);
 		}
 	}
-	printf("Calibration data collected.\n");
+	printf("Calibration data collected from this camera.\n");
 
 	calibration.finalize(frame);
 
-	printf("Calibration finished... ending thread\n");*/
+	printf("Calibration finished...\n");
+}
+
+void CalibrationThread::setWindow(GtkWindowThread* winThread, int winNumber)
+{
+	windowThread = winThread;
+	windowNumber = winNumber;
 }
 
 } // end namespace Device

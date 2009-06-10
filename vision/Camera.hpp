@@ -17,6 +17,9 @@ class Camera
 		 */
 		Camera(int device=0);
 
+		/**
+		 * Dtor
+		 */
 		~Camera();
 		
 		/**
@@ -41,13 +44,13 @@ class Camera
 		 * Do not release or modify the image that is returned.
 		 * Resized if requested by setResize().
 		 */
-		IplImage* queryFrame();
+		IplImage* queryFrame(bool returnCalibrated=true);
 		
 		/**
 		 * Grabs from queryFrame() but adds a histogram 
 		 * to the image.
 		 */
-		IplImage* queryFrameWithHist();
+		IplImage* queryFrameWithHist(bool returnCalibrated=true);
 		
 		/**
 		 * Grabs from queryFrame() but adds chessboard
@@ -56,13 +59,10 @@ class Camera
 		IplImage* queryFrameWithChessboard();
 		
 		/**
-		 * Return the original width of the frame, or the resized width.
+		 * Return the original dimensions of the frame, or the resized 
+		 * dimensions.
 		 */
 		int getWidth();
-
-		/**
-		 * Return the original height of the frame, or the resized height.
-		 */
 		int getHeight();
 
 		/**
@@ -72,20 +72,21 @@ class Camera
 		Device::Calibration* getCalibration();
 
 		/**
-		 * Save the configuration.
+		 * Save or load calibration config files.
 		 */
 		bool saveConfig(const char* filename);
-
-		/**
-		 * Load a configuration file.
-		 */
 		bool loadConfig(const char* filename);
 
-	private:
+	protected:
 		/**
 		 * Capture structure.
 		 */
 		CvCapture* capture;
+
+		/**
+		 * Device number.
+		 */
+		int deviceNum;
 		
 		/**
 		 * Default resolution.
@@ -100,14 +101,10 @@ class Camera
 		int resizeHeight;
 
 		/**
-		 * Automatic allocation/deallocation buffer for queryFrame().
+		 * Image Buffers
 		 */
-		IplImage* queryFrameBuff;
-
-		/**
-		 * Allocation/deallocation buffer for calibrated images.
-		 */
-		IplImage* calibratedBuff;
+		IplImage* queryFrameBuff; // Hacked in auto dealloc for queryFrame().
+		IplImage* calibratedBuff; // Automatic dealloc for calibrated images.
 
 		/**
 		 * Calibration tool for this device.

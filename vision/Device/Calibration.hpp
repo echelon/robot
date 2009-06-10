@@ -6,6 +6,12 @@
 // forward declarations
 namespace Vision {
 	class Camera;
+	class GtkWindowThread;
+}
+namespace Vision {
+	namespace Device {
+		class CalibrationThread;
+}
 }
 
 namespace Vision {
@@ -18,13 +24,18 @@ namespace Device {
 class Calibration
 {
 	public:
-		Calibration(Camera& cam, CvSize size = cvSize(7,7), int numStore = 5);
+		Calibration(Camera* cam, CvSize size = cvSize(7,7), int numStore = 5);
 		~Calibration();
 
 		/**
-		 * Determine if calibration has finished (or was performed at all).
+		 * Determine if calibration has finished or was loaded from file.
 		 */
-		bool isCalibrated(); // TODO: Don't know about the semantics of this
+		bool isCalibrated();
+
+		/**
+		 * Determine if calibration has started.
+		 */
+		bool isStarted();
 
 		/**
 		 * Calibrate the camera. Launches as a new thread, so control the
@@ -42,8 +53,6 @@ class Calibration
 		 * Load a precalibrated configurations from XML.
 		 */
 		bool load(const char* filename);
-
-
 
 		/**
 		 * Find the chessboard corners.
@@ -89,6 +98,11 @@ class Calibration
 		 */
 		Camera& getCamera();
 
+		/**
+		 * Set the gui
+		 */
+		void setWindow(GtkWindowThread* winThread, int winNumber);
+
 	private:
 		// TODO NEW VARS
 		bool calibrationStarted;
@@ -96,8 +110,11 @@ class Calibration
 		bool calibrationLoaded;
 		unsigned int skipCount;
 
-		// Reference to camera
-		Camera& camera;
+		// Camera
+		Camera* camera;
+
+		// Calibration Thread
+		CalibrationThread* calibrationThread;
 
 
 		// TODO: Rename member vars to be more specific...
@@ -131,6 +148,12 @@ class Calibration
 		// maps
 		IplImage* mapx;
 		IplImage* mapy;
+
+		/**
+		 * Gui Presentation
+		 */
+		GtkWindowThread* windowThread;
+		int windowNumber;
 
 };
 }

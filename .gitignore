@@ -11,3 +11,6 @@ testApp
 
 # Example code
 examples/*
+
+# Environment
+.anjuta/*
