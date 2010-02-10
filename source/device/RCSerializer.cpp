@@ -1,6 +1,7 @@
 #include "RCSerializer.hpp"
 #include <string.h>
 #include <stdio.h>
+#include <sstream>
 
 namespace Device {
 
@@ -35,8 +36,8 @@ std::string RCSerializer::fw()
 	serial->write("fw\r");
 
 	ret = serial->read();
-
 	serial->flush();
+
 	return ret;
 }
 
@@ -48,29 +49,24 @@ std::string RCSerializer::battery()
 	serial->write("sensor 5\r");
 
 	ret = serial->read();
-
 	serial->flush();
+
 	return ret;
 }
 
 bool RCSerializer::mogo(int m1, int m2)
 {
 	std::string read;
-	std::string buff;
+	std::ostringstream os;
 
+	// send *prioritized* stop message instead of mogo 1:0 2:0
 	if(m1 == 0 && m2 == 0) {
-		// send prioritized stop message instead
 		return stop(); 
 	}
 
-	// TODO (2/10/2010) ostringstream
+	os << "mogo 1:" << m1 << " 2:" << m2 << "\r";
 
-	//char buff[50];
-	//sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
-
-	buff = "mogo 1:50 2:50\r"; // XXX: TEMP ONLY
-
-	read = serial->writeRead(buff);
+	read = serial->writeRead(os.str());
 
 	if(!checkAck(read)) {
 		return false;
@@ -92,34 +88,29 @@ bool RCSerializer::mogo(int m1, int m2)
 
 bool RCSerializer::blink(int r1, int r2)
 {
-	//char buff[50];
-	std::string buff; 
+	std::ostringstream os;
 
 	if(r1 < 0 && r2 < 0) {
-		printf("Blink rates need to be set\n");
+		fprintf(stderr, "Blink rates need to be set\n");
 		return false;
 	}
 
 	if(r1 > 127 || r2 > 127) {
-		printf("Blink rates out of bounds\n");
+		fprintf(stderr, "Blink rates out of bounds\n");
 		return false;
 	}
 
-	// XXX TODO: std::ostringstream (2/10/2010)
-
-	/*if(r1 >= 0 && r2 < 0) {
-		sprintf(buff, "blink 1:%d\r", r1);
+	if(r1 >= 0 && r2 < 0) {
+		os << "blink 1:" << r1 << "\r";
 	}
 	else if(r1 < 0 && r2 >= 0) {
-		sprintf(buff, "blink 2:%d\r", r2);
+		os << "blink 2:" << r2 << "\r";
 	}
 	else {
-		sprintf(buff, "blink 1:%d 2:%d\r", r1, r2);
-	}*/
+		os << "blink 1:" << r1 << " 2:" << r2 << "\r";
+	}
 
-	buff = "blink1:50 2:50\r"; // XXX: TEMP ONLY
-
- 	return serial->write(buff);
+ 	return serial->write(os.str());
 }
 
 bool RCSerializer::stop()
@@ -143,23 +134,31 @@ void RCSerializer::open()
 // TODO CLEAN UP STRINGS (2/10/2010)
 bool RCSerializer::checkAck(std::string read)
 {
-	const char* ack = strstr((const char*)read.c_str(), "ACK\r\n>");
+	const char* ack = 0;
+	const char* nack = 0;
+
+	if(read.length() < 1) {
+		fprintf(stderr, 
+		  "RCSerializer::checkAck, no data was received in acknowledgement.\n");
+		return false;
+	}
+
+	// Acknowledged 
+	ack = strstr((const char*)read.c_str(), "ACK\r\n>");
 	if(ack != 0) {
 		return true;
 	}
 
-	const char* nack = strstr((const char*)read.c_str(), "NACK\r\n>");
+	// Not Acknowledged 
+	// XXX: May want to output messages on NACK... Consider returning int codes
+	// or throwing an exception. 
+	nack = strstr((const char*)read.c_str(), "NACK\r\n>");
 	if(nack != 0) {
-		printf("RCSerializer::checkAck, request generated a NACK response.\n");
 		return false;
 	}
 
-	if(read.length() < 1) {
-		printf("RCSerializer::checkAck, no data was received in acknowledgement.\n");
-		return false;
-	}
-
-	printf("RCSerializer::checkAck, response recieved wasn't understood.\n");
+	fprintf(stderr, 
+		"RCSerializer::checkAck, response recieved wasn't understood.\n");
 	return false;
 }
 
