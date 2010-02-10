@@ -3,7 +3,6 @@
 #include <fcntl.h> // file control
 #include <sys/select.h> // select()
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>	// UNIX standard functions
 #include <stdexcept>
 
@@ -124,40 +123,44 @@ int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, b
 	return r;
 }
 
-char* Serial::read(unsigned int bytes)
+std::string Serial::read(unsigned int bytes)
 {
+	std::string ret = "";
+
 	if(!isOpen()) {
 		printf("Serial, Can't read from a non-open file.\n");
 		return 0;
 	}
 
 	pthread_mutex_lock(&mutex);
-	char* ret = doRead(bytes);
+	ret = doRead(bytes);
 	flush(); // TODO (Still not working?)
 	pthread_mutex_unlock(&mutex);
 
 	return ret;
 }
 
-bool Serial::write(const char* data, bool priority)
+bool Serial::write(std::string data, bool priority)
 {
+	bool ret;
+
 	if(!isOpen()) {
 		printf("Serial, Can't write to a non-open file.\n");
 		return false;
 	}
 
 	pthread_mutex_lock(&mutex);
-	bool ret = doWrite(data, priority);
+	ret = doWrite(data, priority);
 	flush(); // TODO (Still not working?)
 	pthread_mutex_unlock(&mutex);
 
 	return ret;
 }
 
-char* Serial::writeRead(const char* inBuff, unsigned int readBytes)
+std::string Serial::writeRead(std::string inBuff, unsigned int readBytes)
 {
-	bool  wrRet;
-	char* rdRet;
+	bool wrRet;
+	std::string rdRet = "";
 
 	pthread_mutex_lock(&mutex);
 	wrRet = doWrite(inBuff);
@@ -168,7 +171,7 @@ char* Serial::writeRead(const char* inBuff, unsigned int readBytes)
 		return 0;
 	}
 
-	rdRet = (char*)doRead(readBytes);
+	rdRet = doRead(readBytes);
 	flush(); // TODO (Still not working?)
 
 	pthread_mutex_unlock(&mutex);
@@ -176,15 +179,15 @@ char* Serial::writeRead(const char* inBuff, unsigned int readBytes)
 	return rdRet;
 }
 
-
-char* Serial::doRead(unsigned int bytes)
+// TODO XXX FIXME TODO: THIS IS REALLY UGLY! GAH!
+std::string Serial::doRead(unsigned int bytes)
 {
+	std::string buff;
+	int failcnt = 0;
+
 	if(bytes < 1) {
 		return 0;
 	}
-
-	std::string buff;
-	int failcnt = 0;
 
 	while(buff.length() < bytes) 
 	{
@@ -217,10 +220,10 @@ char* Serial::doRead(unsigned int bytes)
 	}
 	//tcflush(fd, TCIOFLUSH);
 
-	return (char*)buff.c_str();
+	return buff;
 }
 
-bool Serial::doWrite(const char* data, bool priority)
+bool Serial::doWrite(std::string data, bool priority)
 {
 	//
 	// TODO/NOTE: Timing was removed. If needed, can see old code in diffs. (4/21/09)

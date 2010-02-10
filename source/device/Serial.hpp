@@ -1,26 +1,37 @@
-#ifndef DEVICE_SERIAL_H
-#define DEVICE_SERIAL_H
+#ifndef Robot_Device_Serial
+#define Robot_Device_Serial
+/**
+ * Copyright (c) 2008 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org
+ * echelon@gmail.com
+ * Code available under the GPL version 3. 
+ *
+ * Description
+ * 
+ * Serial (Linux-specific)
+ * A mutex-locked access object for USB serial I/O devices. Uses termio and 
+ * pthread mutexes. 
+ *
+ * TODO: better opening/closing semantics. Don't throw exceptions! I want to 
+ * be able to start the robot regardless...
+ */
 
 #include <termios.h>
 #include <pthread.h>
-
+#include <string>
 
 namespace Device {
-/**
- * Serial
- * Performs serial I/O.
- */
 class Serial
 {
 	public:
 		
 		/**
-		 * Default constructor
+		 * CTOR
 		 */
 		Serial();
 
 		/**
-		 * Destructor - calls close
+		 * DTOR
 		 */
 		~Serial();
 
@@ -49,7 +60,7 @@ class Serial
 		/**
 		 * Read a specified number of bytes from the line.
 		 */
-		char* read(unsigned int bytes = 1000);
+		std::string read(unsigned int bytes = 1000);
 
 		/**
 		 * Write a specified number of bytes of a character buffer 
@@ -57,14 +68,14 @@ class Serial
 		 * @priority messages skip ahead in queues (if any) and don't get rejected
 		 * @return bool wasWritten
 		 */
-		bool write(const char* data, bool priority = false); 
+		bool write(std::string, bool priority = false); 
 
 		/**
 		 * Write to the line, then read the response.
 		 */
-		char* writeRead(const char* inBuff, unsigned int readBytes = 1000);
+		std::string writeRead(std::string in, unsigned int rbytes = 1000);
 
-		char* test(const char* input);
+		char* test(std::string input);
 
 	protected:
 		/**
@@ -104,8 +115,8 @@ class Serial
 		 * Helper methods perform the actual read/write WITHOUT locking.
 		 * By doing this, mutexes can be used in read(), write(), and writeRead().
 		 */
-		char* doRead(unsigned int bytes = 1000);
-		bool doWrite(const char* data, bool priority = false); 
+		std::string doRead(unsigned int bytes = 1000);
+		bool doWrite(std::string data, bool priority = false); 
 
 };
 }

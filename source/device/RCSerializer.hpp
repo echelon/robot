@@ -15,6 +15,7 @@
  */
 
 #include "Serial.hpp"
+#include <string>
 
 namespace Device {
 class RCSerializer
@@ -40,12 +41,12 @@ class RCSerializer
 		/**
 		 * Get the firmware version of the serializer
 		 */
-		char* fw();
+		std::string fw();
 
 		/**
 		 * Get the battery reading
 		 */
-		char* battery();
+		std::string battery();
 
 		/**
 		 * Issue a motor speed command
@@ -84,7 +85,7 @@ class RCSerializer
 		/**
 		 * Helper function determines if responses were acknowledged.
 		 */
-		bool checkAck(char* read);
+		bool checkAck(std::string read);
 };
 }
 #endif
