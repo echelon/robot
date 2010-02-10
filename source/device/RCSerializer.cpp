@@ -4,35 +4,48 @@
 
 namespace Device {
 
-RCSerializer::RCSerializer() : Serial()
+RCSerializer::RCSerializer() :
+	serial(0),
+	isOwnsSerial(true)
 {
-	// nothing
+	serial = new Serial();
+}
+
+RCSerializer::RCSerializer(Serial* ser, bool grantOwner) :
+	serial(0),
+	isOwnsSerial(grantOwner)
+{
+	serial = serial;
 }
 
 RCSerializer::~RCSerializer()
 {
-	close();
+	serial->close();
+
+	if(isOwnsSerial) {
+		delete serial;
+	}
 }
 
 char* RCSerializer::fw()
 {
-	flush();
-	write("fw\r");
+	serial->flush();
+	serial->write("fw\r");
 
-	char* ret = read();
+	char* ret = serial->read();
 
-	flush();
+	serial->flush();
 	return ret;
 }
 
 char* RCSerializer::battery()
 {
-	flush();
-	write("sensor 5\r");
+	serial->flush();
+	serial->write("sensor 5\r");
 
-	char* ret = read();
+	char* ret = serial->read();
 
-	flush();
+	serial->flush();
 	return ret;
 }
 
@@ -46,7 +59,7 @@ bool RCSerializer::mogo(int m1, int m2)
 	char buff[50];
 	sprintf(buff, "mogo 1:%d 2:%d\r", m1, m2);
 
-	char* read = writeRead((const char*)buff);
+	char* read = serial->writeRead((const char*)buff);
 
 	if(!checkAck(read)) {
 		return false;
@@ -90,17 +103,27 @@ bool RCSerializer::blink(int r1, int r2)
 		sprintf(buff, "blink 1:%d 2:%d\r", r1, r2);
 	}
 
- 	return write((const char*)buff);
+ 	return serial->write((const char*)buff);
 }
 
 bool RCSerializer::stop()
 {
-	char* read = writeRead("stop\r");
+	char* read = serial->writeRead("stop\r");
 
 	if(!checkAck(read)) {
 		return false;
 	}
 	return true; 
+}
+
+bool RCSerializer::isOpen()
+{
+	return serial->isOpen();
+}
+
+void RCSerializer::open()
+{
+	serial->open();
 }
 
 bool RCSerializer::checkAck(char* read)

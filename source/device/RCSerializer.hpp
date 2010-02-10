@@ -1,24 +1,39 @@
-#ifndef DEVICE_RCSERIALIZER_H
-#define DEVICE_RCSERIALIZER_H
+#ifndef Robot_Device_RCSerializer
+#define Robot_Device_RCSerializer
+/**
+ * Copyright (c) 2008 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org
+ * echelon@gmail.com
+ * Code available under the GPL version 3. 
+ *
+ * Description
+ * 
+ * RCSerializer
+ * Control interface to Robotics Connection's serializer. Currently, it supports
+ * only a USB serial connection, but could be updated to support the bluetooth
+ * or other communication modules. 
+ */
 
 #include "Serial.hpp"
 
 namespace Device {
-/**
- * RCSerializer
- * Easy to control interface to Robotics Connection's serializer.
- */
-class RCSerializer: public Serial
+class RCSerializer
 {
 	public:
 		
 		/**
-		 * Default constructor
+		 * CTOR
 		 */
 		RCSerializer();
 
 		/**
-		 * Destructor - calls close
+		 * CTOR - pass serial connection object.
+		 * If ownership is granted, DTOR destroys serial connection too. 
+		 */
+		RCSerializer(Serial* ser, bool grantOwnership = true);
+
+		/**
+		 * DTOR
 		 */
 		~RCSerializer();
 
@@ -48,7 +63,24 @@ class RCSerializer: public Serial
 		 */
 		bool stop();
 
+		/**
+		 * TODO: Refactor/remove these passthru methods
+		 */
+		bool isOpen();
+		void open();
+
 	protected:
+		/**
+		 * Serial connection for the RCSerializer.
+		 * This is the only method of communcation to serializer I'll be adding.
+		 */
+		Serial* serial;
+
+		/**
+		 * If this object owns the serial object.
+		 */
+		bool isOwnsSerial;
+
 		/**
 		 * Helper function determines if responses were acknowledged.
 		 */
