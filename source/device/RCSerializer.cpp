@@ -133,9 +133,6 @@ void RCSerializer::open()
 
 bool RCSerializer::checkAck(std::string read)
 {
-	const char* ack = 0;
-	const char* nack = 0;
-
 	if(read.length() < 1) {
 		fprintf(stderr, 
 		  "RCSerializer::checkAck, no data was received in acknowledgement.\n");

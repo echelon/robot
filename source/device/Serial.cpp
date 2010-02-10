@@ -5,14 +5,18 @@
 #include <stdio.h>
 #include <unistd.h>	// UNIX standard functions
 #include <stdexcept>
+#include <sstream>
 
 namespace Device {
 
-Serial::Serial():
+Serial::Serial(int num):
 	fd(0),
 	mutex((pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER)
 {
-	// nothing
+	std::ostringstream os;
+
+	os << "/dev/ttyUSB" << num;
+	device = os.str();
 }
 
 Serial::~Serial()
@@ -24,17 +28,17 @@ void Serial::open() // named to avoid clashes
 {
 	if(isOpen()) {
 		//throw std::runtime_error("Serial is already open");
-		printf("Serial is already open\n");
+		fprintf(stderr, "Serial is already open\n");
 		return;
 	}
 
-	fd = ::open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK); 
+	fd = ::open(device.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK); 
 
 	if (fd == -1) {
-		throw std::runtime_error("Unable to open /dev/ttyUSB0");
+		throw std::runtime_error("Unable to open /dev/ttyUSB#.");
 	}
 
-	printf("/dev/ttyUSB open on %d\n", fd);
+	fprintf(stderr, "/dev/ttyUSB# open on fd %d\n", fd);
 
 	// alter the current options
     tcgetattr(fd, &options);
@@ -128,8 +132,8 @@ std::string Serial::read(unsigned int bytes)
 	std::string ret = "";
 
 	if(!isOpen()) {
-		printf("Serial, Can't read from a non-open file.\n");
-		return 0;
+		fprintf(stderr, "Serial, Can't read from a non-open file.\n");
+		return "";
 	}
 
 	pthread_mutex_lock(&mutex);
@@ -145,7 +149,7 @@ bool Serial::write(std::string data, bool priority)
 	bool ret;
 
 	if(!isOpen()) {
-		printf("Serial, Can't write to a non-open file.\n");
+		fprintf(stderr, "Serial, Can't write to a non-open file.\n");
 		return false;
 	}
 
@@ -167,8 +171,8 @@ std::string Serial::writeRead(std::string inBuff, unsigned int readBytes)
 
 	if(!wrRet) {
 		pthread_mutex_unlock(&mutex);
-		printf("Serial::writeRead, DID NOT WRITE\n"); // keep
-		return 0;
+		fprintf(stderr, "Serial::writeRead, DID NOT WRITE\n"); // keep
+		return "";
 	}
 
 	rdRet = doRead(readBytes);

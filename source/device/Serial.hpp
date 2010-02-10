@@ -24,11 +24,11 @@ namespace Device {
 class Serial
 {
 	public:
-		
 		/**
 		 * CTOR
+		 * Opens /dev/ttyUSB{num}
 		 */
-		Serial();
+		Serial(int num = 0);
 
 		/**
 		 * DTOR
@@ -79,15 +79,9 @@ class Serial
 
 	protected:
 		/**
-		 * Wait for the line to open in given time, a non-blocking select.
+		 * The device used: /dev/ttyUSB{ttyNum}
 		 */
-		int select(
-			int microseconds = 0, // 50500
-			int seconds = 0, 
-			bool chkRead = false, 
-			bool chkWrite = false, 
-			bool chkError = false
-		);
+		std::string device;
 
 		/**
 		 * File descriptor of an open connection.
@@ -108,6 +102,17 @@ class Serial
 		 * Mutex on read/write
 		 */
 		pthread_mutex_t mutex;
+
+		/**
+		 * Wait for the line to open in given time, a non-blocking select.
+		 */
+		int select(
+			int microseconds = 0, // 50500
+			int seconds = 0, 
+			bool chkRead = false, 
+			bool chkWrite = false, 
+			bool chkError = false
+		);
 
 	private:
 
