@@ -1,14 +1,32 @@
-# Generated files
-*.[oa]
-*~
-*.bak
+#### Project Specific Ignore ####
 
-# Binary names - prone to change
+# Compilation targets
 motor
 test
 
-# Example code
-examples/*
+#### Generic Ignore ####
 
-# Environment
+# Generated files
+*~
+*.bak
+*.[oa]
+*.so
+*.os
+*.pyc
+
+# Debugging
+core
+
+# Generic compilation
+a.out
+
+# SCons Database
+.sconsign.dblite
+
+# SWIG Generated Wrappers
+*_wrap.cc
+*_wrap.h
+
+# Development environments
 .anjuta/*
+

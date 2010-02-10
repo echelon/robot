@@ -1,7 +1,22 @@
-1 -
-SIFT Library not linking properly. What's wrong?
-Do we need to do something to the object table?
+    Old cruft will be deleted from the project. Vision libs will be
+    maintained separately. AI libs will be maintained in a new project.
+    
+    Main goal of project is now to create a linux-based robot daemon that 
+    can run and intercept:
+    
+    * Keyboard
+    * Joypad (with PS3, maybe XBox profiles)
+    
+    Commands will then be issued through the daemon to the robot.
+    As I continue to work, I want the following:
+    
+    * dbus-based control
+    * local wifi-based and/or remote internet-based control of the robot
+    * shared memory-based control
+    
+    Further longterm hardware plans:
+    
+    * Support various robot hardware
+    * Support arduino (various versions)
+    * Support query of multiple sensors to help localization.
 
-2 -
-Once enough vision libs are here, create an external
-library for them distinct from this project.

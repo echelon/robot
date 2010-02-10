@@ -20,7 +20,7 @@ void RobotState::setMotors(int m1, int m2)
 	pthread_mutex_lock(&mutex);
 	if(m1 == state.m1 && m2 == state.m2) { // TODO: Need to do this within mutex?
 		pthread_mutex_unlock(&mutex);
-		printf("RobotState::setMotors, No change in motor state.\n"); // keep
+		//printf("RobotState::setMotors, No change in motor state.\n"); // keep
 		return;
 	}
 
@@ -35,7 +35,7 @@ void RobotState::setBlink(int l1, int l2)
 	pthread_mutex_lock(&mutex);
  	if(l1 == state.l1 && l2 == state.l2) { // TODO: Need to do this within mutex?
 		pthread_mutex_unlock(&mutex);
-		printf("RobotState::setBlink, No change in blink state.\n"); // keep
+		//printf("RobotState::setBlink, No change in blink state.\n"); // keep
 		return;
 	}
 
