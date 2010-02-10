@@ -49,7 +49,7 @@ class Serial
 		/**
 		 * Read a specified number of bytes from the line.
 		 */
-		char* read(int bytes = 1000);
+		char* read(unsigned int bytes = 1000);
 
 		/**
 		 * Write a specified number of bytes of a character buffer 
@@ -62,7 +62,7 @@ class Serial
 		/**
 		 * Write to the line, then read the response.
 		 */
-		char* writeRead(const char* inBuff, int readBytes = 1000);
+		char* writeRead(const char* inBuff, unsigned int readBytes = 1000);
 
 		char* test(const char* input);
 
@@ -104,7 +104,7 @@ class Serial
 		 * Helper methods perform the actual read/write WITHOUT locking.
 		 * By doing this, mutexes can be used in read(), write(), and writeRead().
 		 */
-		char* doRead(int bytes = 1000);
+		char* doRead(unsigned int bytes = 1000);
 		bool doWrite(const char* data, bool priority = false); 
 
 };

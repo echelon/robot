@@ -124,7 +124,7 @@ int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, b
 	return r;
 }
 
-char* Serial::read(int bytes)
+char* Serial::read(unsigned int bytes)
 {
 	if(!isOpen()) {
 		printf("Serial, Can't read from a non-open file.\n");
@@ -154,7 +154,7 @@ bool Serial::write(const char* data, bool priority)
 	return ret;
 }
 
-char* Serial::writeRead(const char* inBuff, int readBytes)
+char* Serial::writeRead(const char* inBuff, unsigned int readBytes)
 {
 	bool  wrRet;
 	char* rdRet;
@@ -177,7 +177,7 @@ char* Serial::writeRead(const char* inBuff, int readBytes)
 }
 
 
-char* Serial::doRead(int bytes)
+char* Serial::doRead(unsigned int bytes)
 {
 	if(bytes < 1) {
 		return 0;
