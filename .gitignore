@@ -4,10 +4,8 @@
 *.bak
 
 # Binary names - prone to change
-motorApp
-laserApp
-stereoApp
-testApp
+motor
+test
 
 # Example code
 examples/*

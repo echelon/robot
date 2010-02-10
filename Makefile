@@ -9,86 +9,33 @@ LIBS = -L/usr/local/bin -lhighgui -lstdc++ -lpthread -lfeat \
 
 all: 
 	@echo "Cannot compile all projects in development branch."
-	@echo "make [laser, motor, sift, stereo]"
+	@echo "make [motor, ...]"
 
 .PHONY: clean
 clean:
-	$(RM) -f *.o *.a *.out laserApp motorApp stereoApp siftApp testApp
-	cd ./ai && $(RM) -f *.o *.out
+	$(RM) -f *.o *.a *.out laser motor stereo sift test
 	cd ./controller && $(RM) -f *.o *.out
 	cd ./device && $(RM) -f *.o *.out
-	cd ./etc && $(RM) -f *.o *.out
 	cd ./internals && $(RM) -f *.o *.out
-	cd ./vision && $(RM) -f *.o *.out
-	cd ./vision/Device && $(RM) -f *.o *.out
-	cd ./Projects && $(RM) -f */*.o */*.out
-
-
-### TEST ###########################
-test: test.cpp
-	$(COMPILE) $(INCPATH) -c test.cpp
-	$(LINK) test.o $(LIBS) -o testApp
-
-
-### SIFT TEST ######################
-sift: Projects/sift/main.o internals/Registry.o vision/Camera.o vision/HighGuiWindow.o
-	@echo "== Linking Laser =="
-	$(LINK) Projects/sift/main.o internals/Registry.o vision/Camera.o \
-	vision/HighGuiWindow.o $(LIBS) -o sift
-	@echo "========== Laser compile SUCCESS! =========="
-	
-Projects/sift/main.o: Projects/sift/main.cpp
-	@echo "== Compiling Laser =="
-	cd ./Projects/sift && $(COMPILE) $(INCPATH) -c main.cpp
-
-### STEREO TEST ######################
-stereo: Projects/stereo/main.o \
-	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/GtkWindowThread.o \
-	vision/Device/Calibration.o vision/Device/CalibrationThread.o vision/Camera.o
-	@echo "== Linking Stereo =="
-	$(LINK) Projects/stereo/main.o \
-	internals/Registry.o internals/Thread.o internals/MainThreadControl.o \
-	vision/GtkWindowThread.o \
-	vision/Device/Calibration.o vision/Device/CalibrationThread.o vision/Camera.o \
-	$(LIBS) -o stereoApp
-	@echo "========== Stereo compile SUCCESS! =========="
-	@clear
-	@echo "Stereo project compiled successfully."
-	
-Projects/stereo/main.o: Projects/stereo/main.cpp
-	@echo "== Compiling Stereo =="
-	cd ./Projects/stereo && $(COMPILE) $(INCPATH) -c main.cpp
-
-### LASER TEST #####################
-laser: Projects/laser/main.o internals/Registry.o vision/Camera.o vision/HighGuiWindow.o
-	@echo "== Linking Laser =="
-	$(LINK) Projects/laser/main.o internals/Registry.o vision/Camera.o \
-	vision/HighGuiWindow.o $(LIBS) -o laserApp
-	@echo "========== Laser compile SUCCESS! =========="
-	
-Projects/laser/main.o: Projects/laser/main.cpp
-	@echo "== Compiling Laser =="
-	cd ./Projects/laser && $(COMPILE) $(INCPATH) -c main.cpp
 
 ### MOTOR TEST #####################
-motor: Projects/motor/main.o \
+motor: motor.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
 	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/RobotThread.o
 	@echo "== Linking Motor =="
-	$(LINK) Projects/motor/main.o \
+	$(LINK) motor.o \
 	device/RCSerializer.o device/Serial.o device/Joystick.o device/Keyboard.o \
 	internals/Thread.o internals/MainThreadControl.o internals/RobotState.o \
 	controller/KeyboardThread.o controller/XboxThread.o controller/RobotThread.o \
-	$(LIBS) -o motorApp
+	$(LIBS) -o motor
 	@echo "========== Motor compile SUCCESS! =========="
 	@clear
 	@echo "Motor project compiled successfully."
 	
-Projects/motor/main.o: Projects/motor/main.cpp
+motor.o: motor.cpp
 	@echo "== Compiling Motor =="
-	cd ./Projects/motor && $(COMPILE) $(INCPATH) -c main.cpp
+	$(COMPILE) $(INCPATH) -c motor.cpp
 
 ### CONTROLLER LIBS ################
 controller/KeyboardThread.o: controller/KeyboardThread.cpp controller/KeyboardThread.hpp

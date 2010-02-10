@@ -1,12 +1,12 @@
 /**
  * Motor run test
  */
-#include "../../controller/KeyboardThread.hpp"
-#include "../../controller/XboxThread.hpp"
-#include "../../controller/RobotThread.hpp"
-#include "../../device/RCSerializer.hpp"
-#include "../../internals/MainThreadControl.hpp"
-#include "../../internals/RobotState.hpp"
+#include "controller/KeyboardThread.hpp"
+#include "controller/XboxThread.hpp"
+#include "controller/RobotThread.hpp"
+#include "device/RCSerializer.hpp"
+#include "internals/MainThreadControl.hpp"
+#include "internals/RobotState.hpp"
 
 #include <iostream>
 #include <stdio.h>
