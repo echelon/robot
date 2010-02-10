@@ -1,5 +1,5 @@
 #include "RCSerializer.hpp"
-#include <string.h>
+//#include <string.h>
 #include <stdio.h>
 #include <sstream>
 
@@ -59,7 +59,7 @@ bool RCSerializer::mogo(int m1, int m2)
 	std::string read;
 	std::ostringstream os;
 
-	// send *prioritized* stop message instead of mogo 1:0 2:0
+	// send stop message instead of mogo 1:0 2:0
 	if(m1 == 0 && m2 == 0) {
 		return stop(); 
 	}
@@ -131,7 +131,6 @@ void RCSerializer::open()
 	serial->open();
 }
 
-// TODO CLEAN UP STRINGS (2/10/2010)
 bool RCSerializer::checkAck(std::string read)
 {
 	const char* ack = 0;
@@ -144,16 +143,14 @@ bool RCSerializer::checkAck(std::string read)
 	}
 
 	// Acknowledged 
-	ack = strstr((const char*)read.c_str(), "ACK\r\n>");
-	if(ack != 0) {
+	if(read.find("ACK\r\n>") != std::string::npos) {
 		return true;
 	}
 
 	// Not Acknowledged 
-	// XXX: May want to output messages on NACK... Consider returning int codes
+	// TODO: May want to output messages on NACK... Consider returning int codes
 	// or throwing an exception. 
-	nack = strstr((const char*)read.c_str(), "NACK\r\n>");
-	if(nack != 0) {
+	if(read.find("NACK\r\n>") != std::string::npos) {
 		return false;
 	}
 
@@ -162,5 +159,4 @@ bool RCSerializer::checkAck(std::string read)
 	return false;
 }
 
-
-} // end namespace
+} // end namespace Device

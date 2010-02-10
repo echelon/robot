@@ -66,6 +66,7 @@ class RCSerializer
 
 		/**
 		 * TODO: Refactor/remove these passthru methods
+		 * DEPRECATE
 		 */
 		bool isOpen();
 		void open();
@@ -84,6 +85,8 @@ class RCSerializer
 
 		/**
 		 * Helper function determines if responses were acknowledged.
+		 * Pass the data read from the line, and string will be searched for
+		 * ACK/NACK sequence. 
 		 */
 		bool checkAck(std::string read);
 };
