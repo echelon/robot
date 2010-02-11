@@ -2,7 +2,7 @@
  * Motor run test
  */
 #include "controller/KeyboardThread.hpp"
-#include "controller/XboxThread.hpp"
+#include "controller/GameControllerThread.hpp"
 #include "controller/RobotThread.hpp"
 #include "device/RCSerializer.hpp"
 #include "internals/MainThreadControl.hpp"
@@ -18,12 +18,12 @@ int main(int argc, char** argv)
 	serial->open();
 
 	Controller::KeyboardThread keyboardThread(state);
-	Controller::XboxThread xboxThread(state);
+	Controller::GameControllerThread gameThread(state);
 
 	Controller::RobotThread robotThread(serial, state);
 	
 	keyboardThread.start();
-	xboxThread.start();
+	gameThread.start();
 	robotThread.start();
 
 	Internals::MainThreadControl::wait();
@@ -31,8 +31,8 @@ int main(int argc, char** argv)
 	keyboardThread.stop();
 	keyboardThread.join();
 
-	xboxThread.stop();
-	xboxThread.join();
+	gameThread.stop();
+	gameThread.join();
 
 	return 0;
 }

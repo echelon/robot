@@ -1,27 +1,26 @@
-#ifndef CONTROLLER_XBOXTHREAD_H
-#define CONTROLLER_XBOXTHREAD_H
+#ifndef Robot_Controller_GameControllerThread
+#define Robot_Controller_GameControllerThread
 
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
 #include "../device/Joystick.hpp"
 
-namespace Controller {
-
 /**
  * Control via Xbox 360 controller.
  */
-class XboxThread: public Internals::Thread
+namespace Controller {
+class GameControllerThread: public Internals::Thread
 {
 	public:
 		/**
 		 * Constructor
 		 */
-		XboxThread( Internals::RobotState* rs);
+		GameControllerThread( Internals::RobotState* rs);
 
 		/**
 		 * Destructor
 		 */
-		~XboxThread();
+		~GameControllerThread();
 
 		/**
 		 * Maximum value of any joystick axis.

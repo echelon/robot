@@ -1,33 +1,33 @@
-#include "XboxThread.hpp"
+#include "GameControllerThread.hpp"
 #include "../internals/MainThreadControl.hpp"
 
 namespace Controller {
 
-const int XboxThread::MAX_AXIS = 32767;
-const int XboxThread::MIN_AXIS = -32767;
+const int GameControllerThread::MAX_AXIS = 32767;
+const int GameControllerThread::MIN_AXIS = -32767;
 
-XboxThread::XboxThread(Internals::RobotState* rs)
+GameControllerThread::GameControllerThread(Internals::RobotState* rs)
 {
 	state = rs;
 }
 
-XboxThread::~XboxThread()
+GameControllerThread::~GameControllerThread()
 {
 	doDestroy();
 }
 
-void XboxThread::setup()
+void GameControllerThread::setup()
 {
 	joystick = new Device::Joystick;
 }
 
-void XboxThread::destroy()
+void GameControllerThread::destroy()
 {
 	delete joystick;
 	Internals::MainThreadControl::signal();
 }
 
-void XboxThread::execute(void*)
+void GameControllerThread::execute(void*)
 {
 	if(!joystick->isOpen()) {
 		printf("Couldn't establish connection with Xbox controller... abort\n");
@@ -75,7 +75,7 @@ void XboxThread::execute(void*)
 			lspeed = rspeed/2;
 		}
 
-		printf("XboxThread, LS: %d RS: %d\n", lspeed, rspeed);
+		printf("GameControllerThread, LS: %d RS: %d\n", lspeed, rspeed);
 
 		//joystick->printStatus();
 
