@@ -36,6 +36,24 @@ motor: source/motor.cpp libs
 libs: build/out/controller/*.o build/out/device/*.o build/out/internals/*.o
 	@$(CD) .
 
+BINC = -I/usr/include/boost
+BLIB = -lboost_system-mt
+
+########################### SERVER CODE (TEST) ###################
+server: source/server.cpp
+	@echo "[compile] server application"
+	$(CD) ./build/out && $(C) $(INC) $(BINC) -c ../../source/server.cpp
+	$(LN) $(LIBS) $(BLIB) build/out/server.o -o server
+	@chmod +x server
+
+########################### CLIENT CODE (TEST) ###################
+client: source/client.cpp
+	@echo "[compile] client application"
+	$(CD) ./build/out && $(C) $(INC) $(BINC) -c ../../source/client.cpp
+	$(LN) $(LIBS) $(BLIB) build/out/client.o -o client
+	@chmod +x client
+
+
 ### CONTROLLER LIBS ###################
 build/out/controller/*.o: source/controller/*.hpp source/controller/*.cpp
 	@echo "[compile] Controller code"

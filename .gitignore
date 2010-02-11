@@ -3,6 +3,8 @@
 # Compilation targets
 motor
 test
+client
+server
 
 #### Generic Ignore ####
 
