@@ -31,6 +31,7 @@ void RobotThread::execute(void*)
 {
 	if(!serial->isOpen()) {
 		serial->open();
+		// TODO: 2/10/10 - Consider adding a wait condition here.
 		if(!serial->isOpen()) {
 			printf("Serial not open... ending program\n");
 			Internals::MainThreadControl::signal();
@@ -39,12 +40,8 @@ void RobotThread::execute(void*)
 	}
 
 	Internals::robot_state_t curState;
-	Internals::robot_state_t lastState;
-	//bool motorSent = false;
-	//bool blinkSent = false;
 
 	while(!stopFlag) {
-		lastState = curState;
 		curState = state->getState();
 
 		// Motor
