@@ -3,6 +3,9 @@
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 
+
+#include "controller/KeyboardThread.hpp"
+
 // THIS IS FROM THE BOOST ASIO TUTORIAL
 
 using boost::asio::ip::tcp;
@@ -44,6 +47,13 @@ int main(int argc, char** argv)
 
       std::cout.write(buf.data(), len);
     }
+
+	// Write data to the socket if there's anything to write
+	while(1) {
+		boost::system::error_code error;
+
+		size_t len = socket.write_some(buf);
+	}
 
 
 	printf("Done\n");

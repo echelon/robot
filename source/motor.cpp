@@ -4,6 +4,7 @@
 #include "controller/KeyboardThread.hpp"
 #include "controller/GameControllerThread.hpp"
 #include "controller/RobotThread.hpp"
+#include "controller/SyncIoThread.hpp"
 #include "device/RCSerializer.hpp"
 #include "internals/MainThreadControl.hpp"
 #include "internals/RobotState.hpp"
@@ -19,11 +20,13 @@ int main(int argc, char** argv)
 
 	Controller::KeyboardThread keyboardThread(state);
 	Controller::GameControllerThread gameThread(state);
+	Controller::SyncIoThread syncioThread(state);
 
 	Controller::RobotThread robotThread(serial, state);
 	
 	keyboardThread.start();
-	gameThread.start();
+	//gameThread.start();
+	syncioThread.start();
 	robotThread.start();
 
 	Internals::MainThreadControl::wait();
@@ -31,8 +34,11 @@ int main(int argc, char** argv)
 	keyboardThread.stop();
 	keyboardThread.join();
 
-	gameThread.stop();
-	gameThread.join();
+	//gameThread.stop();
+	//gameThread.join();
+
+	syncioThread.stop();
+	syncioThread.join();
 
 	return 0;
 }

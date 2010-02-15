@@ -14,7 +14,7 @@ all:
 
 .PHONY: clean
 clean:
-	$(RM) laser motor stereo sift test
+	$(RM) laser motor stereo sift test client server
 	cd ./build && $(RM) */*.o */*.so */*/*.o */*/*.so 
 
 .PHONY: stats
