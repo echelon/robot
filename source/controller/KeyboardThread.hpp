@@ -1,9 +1,9 @@
-#ifndef CONTROLLER_KEYBOARDTHREAD_H
-#define CONTROLLER_KEYBOARDTHREAD_H
+#ifndef Robot_Controller_KeyboardThread
+#define Robot_Controller_KeyboardThread
 
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
-#include "../device/Keyboard.hpp"
+#include "../hardware/Keyboard.hpp"
 
 // TODO: Move to namespace Controller
 
@@ -25,7 +25,7 @@ class KeyboardThread: public Internals::Thread
 
 	private:
 		Internals::RobotState* state;
-		Device::Keyboard* keyboard;
+		Hardware::Keyboard* keyboard;
 
 };
 }

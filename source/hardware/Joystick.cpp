@@ -1,34 +1,48 @@
 #include "Joystick.hpp"
 
-namespace Device {
+#include <sstream>
+#include <stdexcept>
 
-Joystick::Joystick()
+namespace Hardware {
+
+Joystick::Joystick(int num)
 {
-	fd = open("/dev/input/js0", O_RDONLY);
+	std::ostringstream os;
+
+	os << "/dev/input/js" << num;
+	devName = os.str();
+
+	open();
+}
+
+Joystick::~Joystick()
+{
+	// Nothing specific. 
+	// ~Device() should close
+}
+
+void Joystick::open()
+{
+	if(isOpen()) {
+		//throw std::runtime_error("Joystick is already open");
+		fprintf(stderr, "Joystick is already open\n");
+		return;
+	}
+
+	fd = ::open(devName.c_str(), O_RDONLY);
 	if(fd < 1) {
-		printf("Failed to open joystick device\n");
-		// TODO: Throw exception
+		throw std::runtime_error("Unable to open /dev/input/js#.");
 	}
 
 	// Get hardware info
 	ioctl(fd, JSIOCGAXES, &numAxis);
 	ioctl(fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(fd, JSIOCGVERSION, &version);
-	ioctl(fd, JSIOCGNAME(80), &deviceName);
+	ioctl(fd, JSIOCGNAME(80), &jsName);
 	fcntl(fd, F_SETFL, O_NONBLOCK);
 
 	axisPos = std::vector<int>(numAxis);
 	buttonPos = std::vector<int>(numButtons);
-}
-
-Joystick::~Joystick()
-{
-	close(fd);
-}
-
-bool Joystick::isOpen()
-{
-	return (fd > 0);
 }
 
 void Joystick::updateStatus()
@@ -78,7 +92,7 @@ void Joystick::printStatus()
 	printf ("axis : %d\n", numAxis);
 	printf ("buttons : %d\n", numButtons);
 	printf ("version : %d\n", version);
-	printf ("name : %s\n", deviceName);
+	printf ("name : %s\n", jsName.c_str());
 	printf ("----------------------------------------------\n");
 	printf ("last ev time : %d\n", ev.time);
 
@@ -116,4 +130,4 @@ int Joystick::getLTrigAxis() { return axisPos[5]; } // reversed
 int Joystick::getDpadXAxis() { return axisPos[6]; }
 int Joystick::getDpadYAxis() { return axisPos[7]; }
 
-} // end namespace
+} // end namespace Hardware

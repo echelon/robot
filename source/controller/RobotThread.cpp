@@ -5,7 +5,7 @@
 
 namespace Controller {
 
-RobotThread::RobotThread(Device::RCSerializer* ser, Internals::RobotState* rs)
+RobotThread::RobotThread(Hardware::RCSerializer* ser, Internals::RobotState* rs)
 {
 	serial = ser;
 	state = rs;

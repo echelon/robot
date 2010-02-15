@@ -33,7 +33,7 @@ motor: source/motor.cpp libs
 	@$(LN) $(LIBS) build/out/motor.o build/out/*/*.o -o motor
 	@chmod +x motor
 
-libs: build/out/controller/*.o build/out/device/*.o build/out/internals/*.o
+libs: build/out/controller/*.o build/out/hardware/*.o build/out/internals/*.o
 	@$(CD) .
 
 BINC = -I/usr/include/boost
@@ -60,10 +60,10 @@ build/out/controller/*.o: source/controller/*.hpp source/controller/*.cpp
 	@$(CD) ./build/out/controller && $(C) $(INC) -c ../../../source/controller/*.cpp
 
 
-### DEVICE LIBS ###################
-build/out/device/*.o: source/device/*.hpp source/device/*.cpp
-	@echo "[compile] Device code"
-	@$(CD) ./build/out/device && $(C) $(INC) -c ../../../source/device/*.cpp
+### HARDWARE LIBS ###################
+build/out/hardware/*.o: source/hardware/*.hpp source/hardware/*.cpp
+	@echo "[compile] Hardware code"
+	@$(CD) ./build/out/hardware && $(C) $(INC) -c ../../../source/hardware/*.cpp
 
 
 ### INTERNAL LIBS ###################

@@ -17,7 +17,7 @@
 #include "Serial.hpp"
 #include <string>
 
-namespace Device {
+namespace Hardware {
 class RCSerializer
 {
 	public:

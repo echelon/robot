@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-namespace Device {
+namespace Hardware {
 
 Keyboard::Keyboard()
 {
@@ -58,4 +58,4 @@ int Keyboard::getch()
     return ch;
 }
 
-} // end namespace
+} // end namespace Hardware

@@ -3,7 +3,7 @@
 
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
-#include "../device/Joystick.hpp"
+#include "../hardware/Joystick.hpp"
 
 /**
  * Control via synchronous IO with a client.

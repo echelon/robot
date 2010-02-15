@@ -1,15 +1,15 @@
-#ifndef CONTROLLER_ROBOTTHREAD_H
-#define CONTROLLER_ROBOTTHREAD_H
+#ifndef Robot_Controller_RobotThread
+#define Robot_Controller_RobotThread
 
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
-#include "../device/RCSerializer.hpp"
+#include "../hardware/RCSerializer.hpp"
 
 namespace Controller {
 class RobotThread: public Internals::Thread
 {
 	public:
-		RobotThread(Device::RCSerializer* ser, Internals::RobotState* rs);
+		RobotThread(Hardware::RCSerializer* ser, Internals::RobotState* rs);
 		~RobotThread();
 
 	protected:
@@ -22,7 +22,7 @@ class RobotThread: public Internals::Thread
 
 
 	private:
-		Device::RCSerializer* serial;
+		Hardware::RCSerializer* serial;
 		Internals::RobotState* state;
 		
 };

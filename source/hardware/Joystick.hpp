@@ -1,5 +1,7 @@
-#ifndef DEVICE_JOYSTICK_H
-#define DEVICE_JOYSTICK_H
+#ifndef Robot_Hardware_Joystick
+#define Robot_Hardware_Joystick
+
+#include "Device.hpp"
 
 // TODO: Are all of these headers necessary?
 #include <stdio.h>
@@ -9,37 +11,42 @@
 #include <unistd.h>
 
 #include <vector>
+#include <string>
 
 #include <linux/joystick.h>
 
-namespace Device {
+namespace Hardware {
 
 /**
- * Query the Xbox 360 controller (as a system joystick)
+ * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
  *
  * Adapted from: 
  * http://coding.derkeiler.com/Archive/General/comp.programming/2007-05/msg00480.html
  */
 
-// TODO: this should be a generic joystick subclassed by an Xbox joystick
-// TODO: Xbox controller interface should work under xpad and xboxdrv as well
-// 		 as their respective mappings
+// TODO: Subclass for specific button mappings for Xbox/PS3 controller?
 
-class Joystick 
+class Joystick : public Device
 {
 	public:
 		/**
-		 * Instantiate axcess interface for the device - creates a 
-		 * connection and queries for initial parameters.
+		 * CTOR.
+		 * Creates connection and queries for initial parameters.
+		 * Opens /dev/input/js{num}
 		 */
-		Joystick();
+		Joystick(int num = 0);
 
 		/**
-		 * Close the open connection.
+		 * DTOR.
+		 * Closes connection. 
 		 */
-		~Joystick();
+		virtual ~Joystick();
 
-		bool isOpen();
+
+		/**
+		 * Open the connection. 
+		 */
+		void open();
 
 		void updateStatus();
 		bool statusHasChanged();
@@ -47,6 +54,7 @@ class Joystick
 
 		/**
 		 * Get button values
+		 * TODO: This is specific for the Xbox controller. 
 		 */
 		int getAButton();
 		int getBButton();
@@ -73,10 +81,6 @@ class Joystick
 		int getDpadYAxis();
 
 	private:
-		/**
-		 * File descriptor.
-		 */
-		int fd;
 
 		/**
 		 * TODO: What is this? Used when reading.
@@ -89,7 +93,8 @@ class Joystick
 		int numAxis;
 		int numButtons;
 		int version;
-		char deviceName[80];
+		//char deviceName[80];
+		std::string jsName;
 
 		/**
 		 * Axis and button state.

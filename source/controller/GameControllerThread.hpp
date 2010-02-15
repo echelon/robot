@@ -3,7 +3,7 @@
 
 #include "../internals/Thread.hpp"
 #include "../internals/RobotState.hpp"
-#include "../device/Joystick.hpp"
+#include "../hardware/Joystick.hpp"
 
 /**
  * Control via Xbox 360 controller.
@@ -57,7 +57,7 @@ class GameControllerThread: public Internals::Thread
 		/**
 		 * Provides joystick access.
 		 */
-		Device::Joystick* joystick;
+		Hardware::Joystick* joystick;
 
 		/**
 		 * Robot state.

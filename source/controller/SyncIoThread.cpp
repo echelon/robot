@@ -15,7 +15,7 @@ SyncIoThread::~SyncIoThread()
 
 void SyncIoThread::setup()
 {
-	//joystick = new Device::Joystick;
+	//joystick = new Hardware::Joystick;
 	// Have an (A)syncIo object?
 
 }

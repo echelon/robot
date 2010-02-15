@@ -1,10 +1,9 @@
-#ifndef Robot_Device_Serial
-#define Robot_Device_Serial
+#ifndef Robot_Hardware_Serial
+#define Robot_Hardware_Serial
 /**
  * Copyright (c) 2008 - 2010 Brandon Thomas Suit
- * http://possibilistic.org
- * echelon@gmail.com
- * Code available under the GPL version 3. 
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
  *
  * Description
  * 
@@ -16,12 +15,14 @@
  * be able to start the robot regardless...
  */
 
+#include "Device.hpp"
+
 #include <termios.h>
 #include <pthread.h>
 #include <string>
 
-namespace Device {
-class Serial
+namespace Hardware {
+class Serial : public Device
 {
 	public:
 		/**
@@ -40,16 +41,6 @@ class Serial
 		 * TODO: Do not fix to /dev/ttyUSB0
 		 */
 		void open();
-
-		/**
-		 * Is the connection handler open?
-		 */
-		bool isOpen();
-		
-		/**
-		 * Close the connection.
-		 */
-		void close();
 
 		/**
 		 * Flush a queue with tcflush. Provide the queue to be flushed,
@@ -75,18 +66,9 @@ class Serial
 		 */
 		std::string writeRead(std::string in, unsigned int rbytes = 1000);
 
-		char* test(std::string input);
+		//char* test(std::string input);
 
 	protected:
-		/**
-		 * The device used: /dev/ttyUSB{ttyNum}
-		 */
-		std::string device;
-
-		/**
-		 * File descriptor of an open connection.
-		 */
-		int fd;
 
 		/**
 		 * Termios options for the connection.

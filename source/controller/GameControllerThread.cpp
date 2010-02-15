@@ -18,7 +18,7 @@ GameControllerThread::~GameControllerThread()
 
 void GameControllerThread::setup()
 {
-	joystick = new Device::Joystick;
+	joystick = new Hardware::Joystick;
 }
 
 void GameControllerThread::destroy()

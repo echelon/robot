@@ -16,7 +16,7 @@ KeyboardThread::~KeyboardThread()
 
 void KeyboardThread::setup()
 {
-	keyboard = new Device::Keyboard();
+	keyboard = new Hardware::Keyboard();
 }
 
 void KeyboardThread::destroy()
@@ -29,7 +29,7 @@ void KeyboardThread::execute(void*)
 {
 	int ch;
 	int lastCh;
-	char* read;
+	//char* read;
 
 	while(!stopFlag) {
 		if(keyboard->kbhit()) {

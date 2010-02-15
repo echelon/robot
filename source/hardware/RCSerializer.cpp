@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <sstream>
 
-namespace Device {
+namespace Hardware {
 
 RCSerializer::RCSerializer() :
 	serial(0),
@@ -156,4 +156,4 @@ bool RCSerializer::checkAck(std::string read)
 	return false;
 }
 
-} // end namespace Device
+} // end namespace Hardware

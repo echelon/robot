@@ -3,7 +3,7 @@
 
 #include <termios.h>
 
-namespace Device {
+namespace Hardware {
 
 /**
  * Query the Keyboard

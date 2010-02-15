@@ -7,21 +7,24 @@
 #include <stdexcept>
 #include <sstream>
 
-namespace Device {
+namespace Hardware {
 
 Serial::Serial(int num):
-	fd(0),
+	Device(),
 	mutex((pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER)
 {
 	std::ostringstream os;
 
 	os << "/dev/ttyUSB" << num;
-	device = os.str();
+	devName = os.str();
+
+	open();
 }
 
 Serial::~Serial()
 {
-	close();
+	// Nothing specific. 
+	// ~Device() should close
 }
 
 void Serial::open() // named to avoid clashes
@@ -32,13 +35,13 @@ void Serial::open() // named to avoid clashes
 		return;
 	}
 
-	fd = ::open(device.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK); 
+	fd = ::open(devName.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK); 
 
 	if (fd == -1) {
 		throw std::runtime_error("Unable to open /dev/ttyUSB#.");
 	}
 
-	fprintf(stderr, "/dev/ttyUSB# open on fd %d\n", fd);
+	printf("/dev/ttyUSB# open on fd %d\n", fd);
 
 	// alter the current options
     tcgetattr(fd, &options);
@@ -75,19 +78,6 @@ void Serial::open() // named to avoid clashes
     tcsetattr(fd, TCSANOW, &options);
 }
 
-bool Serial::isOpen() 
-{
-	return (fd > 0); // 0 is stdin
-}
-
-void Serial::close()
-{
-	if(isOpen()) {
-		printf("Closing connection...\n");
-		::close(fd);
-	}
-}
-
 void Serial::flush(int queue)
 {
 	// Flush input, output, or both
@@ -96,7 +86,6 @@ void Serial::flush(int queue)
 	}
 	tcflush(fd, queue);
 }
-
 
 int Serial::select(int microseconds, int seconds, bool chkRead, bool chkWrite, bool chkError)
 {
@@ -258,4 +247,4 @@ bool Serial::doWrite(std::string data, bool priority)
 
 
 
-} // end namespace
+} // end namespace Hardware
