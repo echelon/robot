@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) 2008 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
+ *
+ * Description
+ * 
+ * Hardware::Serial
+ * A mutex-locked access object for USB serial I/O devices. Uses termio and 
+ * pthread mutexes.
+ *
+ * Linux-specific.  
+ */
+
 #include "Serial.hpp"
 
 #include <fcntl.h> // file control

@@ -1,15 +1,20 @@
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef Robot_Hardware_Keyboard
+#define Robot_Hardware_Keyboard
+/**
+ * Copyright (c) 2009 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
+ *
+ * Description
+ * 
+ * Hardware::Keyboard
+ * A class used to query the keyboard.
+ * Originally adapted from: http://linux-sxs.org/programming/kbhit.html
+ */
 
 #include <termios.h>
 
 namespace Hardware {
-
-/**
- * Query the Keyboard
- * Adapted from: http://linux-sxs.org/programming/kbhit.html
- */
-
 class Keyboard
 {
 	public:

@@ -1,5 +1,18 @@
+/**
+ * Copyright (c) 2008 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org
+ * echelon@gmail.com
+ * Code available under the GPL version 3. 
+ *
+ * Description
+ * 
+ * Hardware::RCSerializer
+ * Control interface to Robotics Connection's serializer. Currently, it supports
+ * only a USB serial connection, but could be updated to support the bluetooth
+ * or other communication modules. 
+ */
+
 #include "RCSerializer.hpp"
-//#include <string.h>
 #include <stdio.h>
 #include <sstream>
 

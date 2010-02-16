@@ -1,12 +1,15 @@
 #ifndef Robot_Hardware_Joystick
 #define Robot_Hardware_Joystick
 /**
- * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
+ * Copyright (c) 2009 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
  *
- * Adapted from: 
- * http://coding.derkeiler.com/Archive/General/comp.programming/2007-05/msg00480.html
+ * Description
+ * 
+ * Hardware::Joystick (a Hardware::Device)
+ * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
  */
-
 
 #include "Device.hpp"
 

@@ -8,7 +8,7 @@
  *
  * Description
  * 
- * RCSerializer
+ * Hardware::RCSerializer
  * Control interface to Robotics Connection's serializer. Currently, it supports
  * only a USB serial connection, but could be updated to support the bluetooth
  * or other communication modules. 

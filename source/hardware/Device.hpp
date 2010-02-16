@@ -1,5 +1,15 @@
 #ifndef Robot_Hardware_Device
 #define Robot_Hardware_Device
+/**
+ * Copyright (c) 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
+ *
+ * Description
+ * 
+ * Hardware::Device (Header Only!)
+ * An abstraction interface for devices opened with open().
+ */
 
 #include <string>
 #include <stdio.h>

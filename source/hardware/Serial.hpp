@@ -7,12 +7,11 @@
  *
  * Description
  * 
- * Serial (Linux-specific)
+ * Hardware::Serial
  * A mutex-locked access object for USB serial I/O devices. Uses termio and 
- * pthread mutexes. 
+ * pthread mutexes.
  *
- * TODO: better opening/closing semantics. Don't throw exceptions! I want to 
- * be able to start the robot regardless...
+ * Linux-specific.  
  */
 
 #include "Device.hpp"

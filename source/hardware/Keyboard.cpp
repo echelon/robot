@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2009 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
+ *
+ * Description
+ * 
+ * Hardware::Keyboard
+ * A class used to query the keyboard.
+ * Originally adapted from: http://linux-sxs.org/programming/kbhit.html
+ */
+
 #include "Keyboard.hpp"
 #include <unistd.h>
 #include <stdio.h>

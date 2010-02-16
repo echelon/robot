@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2009 - 2010 Brandon Thomas Suit
+ * http://possibilistic.org | echelon@gmail.com
+ * Code available under the GPL version 3.
+ *
+ * Description
+ * 
+ * Hardware::Joystick (a Hardware::Device)
+ * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
+ */
+
 #include "Joystick.hpp"
 
 #include <sstream>
