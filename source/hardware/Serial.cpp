@@ -7,9 +7,12 @@
  * 
  * Hardware::Serial
  * A mutex-locked access object for USB serial I/O devices. Uses termio and 
- * pthread mutexes.
+ * pthread mutexes. (The preset baud rates/parity bits may only work for the 
+ * RCSerializer, however.) 
  *
  * Linux-specific.  
+ * 
+ * TODO: This class is a mess. Clean it up. 
  */
 
 #include "Serial.hpp"

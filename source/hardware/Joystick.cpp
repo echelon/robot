@@ -9,6 +9,7 @@
  * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
  *
  * Linux-specific.
+ * 
  * TODO: Subclass for specific button mappings for Xbox/PS3 controller.
  *		 Perhaps create a JoystickFactory to accomplish correct mappings.
  */

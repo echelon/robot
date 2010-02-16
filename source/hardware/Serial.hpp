@@ -9,9 +9,12 @@
  * 
  * Hardware::Serial
  * A mutex-locked access object for USB serial I/O devices. Uses termio and 
- * pthread mutexes.
+ * pthread mutexes. (The preset baud rates/parity bits may only work for the 
+ * RCSerializer, however.) 
  *
  * Linux-specific.  
+ * 
+ * TODO: This class is a mess. Clean it up. 
  */
 
 #include "Device.hpp"
@@ -36,8 +39,8 @@ class Serial : public Device
 		~Serial();
 
 		/**
-		 * Open connection - set up baud rates, parity, etc.
-		 * TODO: Do not fix to /dev/ttyUSB0
+		 * Open the connection
+		 * Sets up correct baud rates, parity, etc. for USB Serial
 		 */
 		void open();
 
@@ -64,8 +67,6 @@ class Serial : public Device
 		 * Write to the line, then read the response.
 		 */
 		std::string writeRead(std::string in, unsigned int rbytes = 1000);
-
-		//char* test(std::string input);
 
 	protected:
 
