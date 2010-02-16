@@ -14,12 +14,11 @@
 
 #include "Serial.hpp"
 
-#include <fcntl.h> // file control
+#include <fcntl.h> // open(), etc.
 #include <sys/select.h> // select()
-#include <stdio.h>
-#include <unistd.h>	// UNIX standard functions
 #include <stdexcept>
 #include <sstream>
+#include <stdio.h>
 
 namespace Hardware {
 

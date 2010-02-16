@@ -7,10 +7,15 @@
  * 
  * Hardware::Joystick (a Hardware::Device)
  * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
+ *
+ * Linux-specific.
+ * TODO: Subclass for specific button mappings for Xbox/PS3 controller.
+ *		 Perhaps create a JoystickFactory to accomplish correct mappings.
  */
 
 #include "Joystick.hpp"
 
+#include <fcntl.h> // open(), etc.
 #include <sstream>
 #include <stdexcept>
 #include <stdio.h>

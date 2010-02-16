@@ -9,24 +9,19 @@
  * 
  * Hardware::Joystick (a Hardware::Device)
  * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
+ *
+ * Linux-specific. 
+ * TODO: Subclass for specific button mappings for Xbox/PS3 controller.
+ *		 Perhaps create a JoystickFactory to accomplish correct mappings.
  */
 
 #include "Device.hpp"
 
-// TODO: Are all of these headers necessary?
 #include <linux/joystick.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-
 #include <vector>
 #include <string>
 
 namespace Hardware {
-
-// TODO: Subclass for specific button mappings for Xbox/PS3 controller?
-
 class Joystick : public Device
 {
 	public:

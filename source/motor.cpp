@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 	Hardware::RCSerializer* serial = 0;
 	Internals::RobotState* state = 0;
 
+	// Ensure we can plug up the robot if we haven't already
 	while(serial == 0) {
 		try {
 			serial = new Hardware::RCSerializer();
