@@ -4,13 +4,6 @@
 #include <string>
 #include <stdio.h>
 
-/**
- * Copyright (c) 2010 Brandon Thomas Suit
- * http://possibilistic.org | echelon@gmail.com
- * Code available under the GPL version 3.
- *
- * Abstraction for devices opened with open()
- */
 namespace Hardware {
 class Device
 {

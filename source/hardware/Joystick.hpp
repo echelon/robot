@@ -1,10 +1,17 @@
 #ifndef Robot_Hardware_Joystick
 #define Robot_Hardware_Joystick
+/**
+ * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
+ *
+ * Adapted from: 
+ * http://coding.derkeiler.com/Archive/General/comp.programming/2007-05/msg00480.html
+ */
+
 
 #include "Device.hpp"
 
 // TODO: Are all of these headers necessary?
-#include <stdio.h>
+#include <linux/joystick.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -13,16 +20,7 @@
 #include <vector>
 #include <string>
 
-#include <linux/joystick.h>
-
 namespace Hardware {
-
-/**
- * Query a system joystick (can be an Xbox 360 controller, PS3 controller, etc.)
- *
- * Adapted from: 
- * http://coding.derkeiler.com/Archive/General/comp.programming/2007-05/msg00480.html
- */
 
 // TODO: Subclass for specific button mappings for Xbox/PS3 controller?
 
@@ -93,7 +91,6 @@ class Joystick : public Device
 		int numAxis;
 		int numButtons;
 		int version;
-		//char deviceName[80];
 		std::string jsName;
 
 		/**
@@ -102,6 +99,9 @@ class Joystick : public Device
 		std::vector<int> axisPos;
 		std::vector<int> buttonPos;
 
+		/**
+		 * If the status has changed.
+		 */
 		bool changed;
 };
 }

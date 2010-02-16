@@ -5,18 +5,33 @@
 #include "controller/GameControllerThread.hpp"
 #include "controller/RobotThread.hpp"
 #include "controller/SyncIoThread.hpp"
-#include "device/RCSerializer.hpp"
+#include "hardware/RCSerializer.hpp"
 #include "internals/MainThreadControl.hpp"
 #include "internals/RobotState.hpp"
 
 #include <iostream>
 #include <stdio.h>
+#include <stdexcept>
 
 int main(int argc, char** argv)
 {
-	Device::RCSerializer* serial = new Device::RCSerializer();
-	Internals::RobotState* state = new Internals::RobotState();
-	serial->open();
+	Hardware::RCSerializer* serial = 0;
+	Internals::RobotState* state = 0;
+
+	while(serial == 0) {
+		try {
+			serial = new Hardware::RCSerializer();
+			printf("USB Serial connected.\n");
+			break;
+		}
+		catch(std::runtime_error e) {
+			printf("Cannot connect to serial... connect USB cable.\n");
+			serial = 0;
+			sleep(5);
+		}
+	}
+
+	state = new Internals::RobotState();
 
 	Controller::KeyboardThread keyboardThread(state);
 	Controller::GameControllerThread gameThread(state);
@@ -25,7 +40,7 @@ int main(int argc, char** argv)
 	Controller::RobotThread robotThread(serial, state);
 	
 	keyboardThread.start();
-	//gameThread.start();
+	gameThread.start();
 	syncioThread.start();
 	robotThread.start();
 
@@ -34,8 +49,8 @@ int main(int argc, char** argv)
 	keyboardThread.stop();
 	keyboardThread.join();
 
-	//gameThread.stop();
-	//gameThread.join();
+	gameThread.stop();
+	gameThread.join();
 
 	syncioThread.stop();
 	syncioThread.join();

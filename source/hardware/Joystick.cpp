@@ -2,10 +2,17 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <stdio.h>
 
 namespace Hardware {
 
-Joystick::Joystick(int num)
+Joystick::Joystick(int num):
+	Device(),
+	numAxis(0),
+	numButtons(0),
+	version(0),
+	axisPos(0),
+	buttonPos(0)
 {
 	std::ostringstream os;
 
@@ -23,6 +30,8 @@ Joystick::~Joystick()
 
 void Joystick::open()
 {
+	char jsNameBuf[80];
+
 	if(isOpen()) {
 		//throw std::runtime_error("Joystick is already open");
 		fprintf(stderr, "Joystick is already open\n");
@@ -32,17 +41,24 @@ void Joystick::open()
 	fd = ::open(devName.c_str(), O_RDONLY);
 	if(fd < 1) {
 		throw std::runtime_error("Unable to open /dev/input/js#.");
+		return;
 	}
+
+	printf("Joystick open on %d\n", (int)fd);
 
 	// Get hardware info
 	ioctl(fd, JSIOCGAXES, &numAxis);
 	ioctl(fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(fd, JSIOCGVERSION, &version);
-	ioctl(fd, JSIOCGNAME(80), &jsName);
+	ioctl(fd, JSIOCGNAME(80), &jsNameBuf); // XXX: Is this ok?
 	fcntl(fd, F_SETFL, O_NONBLOCK);
 
-	axisPos = std::vector<int>(numAxis);
-	buttonPos = std::vector<int>(numButtons);
+	jsName = jsNameBuf;
+
+	axisPos.clear();
+	buttonPos.clear();
+	axisPos.resize(numAxis, 0);
+	buttonPos.resize(numButtons, 0);
 }
 
 void Joystick::updateStatus()
