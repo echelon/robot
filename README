@@ -1,0 +1,30 @@
+==== About ====
+
+This is a Linux-based C++ program designed to work with the Robotics 
+Connection Serializer hardware, but it could easily be adapted to work with the
+Arudino, or any other robotics hardware. 
+
+The main program controls the robot hardware and intercepts input from a variety
+of sources:
+
+	* Keyboard
+	* Joystick (eg. PS3 or Xbox controllers)
+	* A remote PC (over TCP) -- currently a work in progress
+
+By keeping hardware concerns apart from AI code, we can easily and separately 
+maintain a distinct set of computer vision/AI applications that communicate with
+this program in order to drive the robot.
+
+Robotics Connection Serializer website:
+	* http://www.roboticsconnection.com/p-16-serializer-robot-controller.aspx
+
+I'll likely upgrade the code to work with Arudino in the near future. 
+
+==== License / Copyright ====
+
+	This code is licensed under the GNU AGPL 3, but can probably be licensed 
+	under other terms if you contact me. 
+
+	Copyright (c) 2008 - 2010 Brandon Thomas
+	http://possibilistic.org | echelon@gmail.com
+

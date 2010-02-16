@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2009 - 2010 Brandon Thomas Suit
  * http://possibilistic.org | echelon@gmail.com
- * Code available under the GPL version 3.
+ * Code available under the AGPL version 3.
  *
  * Description
  * 
